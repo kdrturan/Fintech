@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/Banking.SharedKernel/Banking.SharedKernel.csproj" Id="11b82179-96bd-493c-b767-45f6d34fd0fe" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Ledger/">
+    <Project Path="src/Modules/Ledger/Banking.Modules.Ledger.Application/Banking.Modules.Ledger.Application.csproj" Id="a2e9ffe7-e5a1-40df-acf0-66f96526478b" />
+    <Project Path="src/Modules/Ledger/Banking.Modules.Ledger.Contracts/Banking.Modules.Ledger.Contracts.csproj" Id="fd92834f-ee4a-46cb-aa40-483a4bd44062" />
+    <Project Path="src/Modules/Ledger/Banking.Modules.Ledger.Domain/Banking.Modules.Ledger.Domain.csproj" Id="b184ddd1-3fea-4133-804e-c9125144d019" />
+    <Project Path="src/Modules/Ledger/Banking.Modules.Ledger.Infrastructure/Banking.Modules.Ledger.Infrastructure.csproj" Id="43c52fb3-d92d-4293-b0cf-4484010d26b5" />
+  </Folder>
+  <Folder Name="/src/Modules/Transfers/">
+    <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Application/Banking.Modules.Transfers.Application.csproj" Id="93cb61cb-7b40-4fd2-ac61-23daf72cc171" />
+    <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Contracts/Banking.Modules.Transfers.Contracts.csproj" Id="b1d362dd-b44b-4423-804d-dd57f779eeb5" />
+    <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Domain/Banking.Modules.Transfers.Domain.csproj" Id="9c385783-1976-4f84-b3ae-d6ccee7ff210" />
+    <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Infrastructure/Banking.Modules.Transfers.Infrastructure.csproj" Id="b94b53b6-9a50-4815-9111-8a78b3ce5e00" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Banking.ArchitectureTests/Banking.ArchitectureTests.csproj" Id="1c2bfb17-9795-44b9-92d7-873a3cc97298" />
+    <Project Path="tests/Banking.IntegrationTests/Banking.IntegrationTests.csproj" Id="469fb7fc-c4a3-444d-97b1-711090967e50" />
+  </Folder>
+  <Project Path="src/Banking.Api/Banking.Api.csproj" />
+</Solution>
