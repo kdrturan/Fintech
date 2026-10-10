@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/src/" />
+  <Folder Name="/src/">
+    <Project Path="src/Banking.Api/Banking.Api.csproj" />
+  </Folder>
   <Folder Name="/src/BuildingBlocks/">
     <Project Path="src/BuildingBlocks/Banking.SharedKernel/Banking.SharedKernel.csproj" Id="11b82179-96bd-493c-b767-45f6d34fd0fe" />
   </Folder>
@@ -20,5 +22,4 @@
     <Project Path="tests/Banking.ArchitectureTests/Banking.ArchitectureTests.csproj" Id="1c2bfb17-9795-44b9-92d7-873a3cc97298" />
     <Project Path="tests/Banking.IntegrationTests/Banking.IntegrationTests.csproj" Id="469fb7fc-c4a3-444d-97b1-711090967e50" />
   </Folder>
-  <Project Path="src/Banking.Api/Banking.Api.csproj" />
 </Solution>
