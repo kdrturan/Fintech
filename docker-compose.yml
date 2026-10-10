@@ -1,0 +1,26 @@
+# Local development infrastructure. Start with: docker compose up -d
+# Credentials below are local-only defaults; override them in a git-ignored .env file.
+name: banking
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-banking}
+      POSTGRES_USER: ${POSTGRES_USER:-banking}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-banking}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      # PostgreSQL 18 images keep data under a version-specific subdirectory of this path.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      # Probe over TCP: on first start the image runs init scripts on a temporary socket-only
+      # server, which a socket-based pg_isready would wrongly report as ready.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
