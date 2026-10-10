@@ -1,3 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\Ledger\Banking.Modules.Ledger.Contracts\Banking.Modules.Ledger.Contracts.csproj" />
+    <ProjectReference Include="..\Banking.Modules.Transfers.Contracts\Banking.Modules.Transfers.Contracts.csproj" />
+    <ProjectReference Include="..\Banking.Modules.Transfers.Domain\Banking.Modules.Transfers.Domain.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,3 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <ProjectReference Include="..\Banking.Modules.Ledger.Application\Banking.Modules.Ledger.Application.csproj" />
+  </ItemGroup>
 </Project>

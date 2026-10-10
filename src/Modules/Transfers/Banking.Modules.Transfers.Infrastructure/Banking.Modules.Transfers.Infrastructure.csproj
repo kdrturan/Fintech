@@ -1,3 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <ProjectReference Include="..\Banking.Modules.Transfers.Application\Banking.Modules.Transfers.Application.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,3 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Banking.Api\Banking.Api.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\Banking.SharedKernel\Banking.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Ledger\Banking.Modules.Ledger.Application\Banking.Modules.Ledger.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Ledger\Banking.Modules.Ledger.Contracts\Banking.Modules.Ledger.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Ledger\Banking.Modules.Ledger.Domain\Banking.Modules.Ledger.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Ledger\Banking.Modules.Ledger.Infrastructure\Banking.Modules.Ledger.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Transfers\Banking.Modules.Transfers.Application\Banking.Modules.Transfers.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Transfers\Banking.Modules.Transfers.Contracts\Banking.Modules.Transfers.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Transfers\Banking.Modules.Transfers.Domain\Banking.Modules.Transfers.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Transfers\Banking.Modules.Transfers.Infrastructure\Banking.Modules.Transfers.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,3 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Banking.Api\Banking.Api.csproj" />
+  </ItemGroup>
 </Project>

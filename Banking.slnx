@@ -19,7 +19,12 @@
     <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Infrastructure/Banking.Modules.Transfers.Infrastructure.csproj" Id="b94b53b6-9a50-4815-9111-8a78b3ce5e00" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Banking.ArchitectureTests/Banking.ArchitectureTests.csproj" Id="1c2bfb17-9795-44b9-92d7-873a3cc97298" />
-    <Project Path="tests/Banking.IntegrationTests/Banking.IntegrationTests.csproj" Id="469fb7fc-c4a3-444d-97b1-711090967e50" />
+    <File Path="tests/Directory.Build.props" />
+    <Project Path="tests/Banking.ArchitectureTests/Banking.ArchitectureTests.csproj" />
+    <Project Path="tests/Banking.IntegrationTests/Banking.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/Çözüm Öğeleri/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
   </Folder>
 </Solution>
