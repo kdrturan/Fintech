@@ -26,5 +26,6 @@
   <Folder Name="/Çözüm Öğeleri/">
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
+    <File Path="docker-compose.yml" />
   </Folder>
 </Solution>

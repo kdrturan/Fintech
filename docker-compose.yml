@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-banking}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-banking}
     ports:
-      - "${POSTGRES_PORT:-5433}:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       # PostgreSQL 18 images keep data under a version-specific subdirectory of this path.
       - postgres-data:/var/lib/postgresql

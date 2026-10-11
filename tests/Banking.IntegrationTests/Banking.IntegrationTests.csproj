@@ -2,4 +2,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Banking.Api\Banking.Api.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Testcontainers.PostgreSql" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+  </ItemGroup>
 </Project>
