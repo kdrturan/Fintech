@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Banking.slnx
+
+      - name: Verify formatting
+        run: dotnet format Banking.slnx --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build Banking.slnx --configuration Release --no-restore
+
+      # Integration tests start PostgreSQL through Testcontainers; the hosted runner ships with Docker.
+      - name: Test
+        run: dotnet test --solution Banking.slnx --configuration Release --no-build

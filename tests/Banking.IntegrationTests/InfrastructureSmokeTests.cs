@@ -1,6 +1,6 @@
 using System.Net;
-using Npgsql;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Npgsql;
 
 namespace Banking.IntegrationTests;
 
