@@ -22,6 +22,7 @@
     <File Path="tests/Directory.Build.props" />
     <Project Path="tests/Banking.ArchitectureTests/Banking.ArchitectureTests.csproj" />
     <Project Path="tests/Banking.IntegrationTests/Banking.IntegrationTests.csproj" />
+    <Project Path="tests/Banking.UnitTests/Banking.UnitTests.csproj" Id="06e521cb-8340-4135-a817-4fab59c8236a" />
   </Folder>
   <Folder Name="/Çözüm Öğeleri/">
     <File Path="Directory.Build.props" />
