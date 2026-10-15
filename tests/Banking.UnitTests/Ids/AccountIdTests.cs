@@ -13,7 +13,7 @@ public sealed class AccountIdTests
     }
 
     [Fact]
-    public void Same_guids_are_equal_id()
+    public void Ids_with_the_same_guid_are_equal()
     {
         var id1 = AccountId.New();
         var id2 = new AccountId(id1.Value);
