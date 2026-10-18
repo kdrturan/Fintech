@@ -45,4 +45,7 @@ public sealed class Account
         var increases = increasesWithDebit == (direction == Direction.Debit);
         return increases ? amount : -amount;
     }
+
+    /// <summary>Only <see cref="PostingEngine"/> may change a balance, after it has validated the whole entry.</summary>
+    internal void Apply(Direction direction, Money amount) => Balance += EffectOf(direction, amount);
 }
