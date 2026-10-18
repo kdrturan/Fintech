@@ -1,3 +1,4 @@
+using System.Globalization;
 using Banking.Modules.Transfers.Domain;
 using Banking.SharedKernel;
 
@@ -85,11 +86,12 @@ public sealed class TransferTests
     }
 
     [Theory]
-    [InlineData(0, false)]
-    [InlineData(0.01, true)]
-    public void The_amount_must_be_greater_than_zero(decimal amount, bool succeeds)
+    [InlineData("0", false)]
+    [InlineData("0.01", true)]
+    public void The_amount_must_be_greater_than_zero(string amount, bool succeeds)
     {
-        var result = Transfer.Create(Ahmet, Ayse, Money.Of(amount, Currency.TRY));
+        var decimalAmount = decimal.Parse(amount, CultureInfo.InvariantCulture);
+        var result = Transfer.Create(Ahmet, Ayse, Money.Of(decimalAmount, Currency.TRY));
         result.IsSuccess.ShouldBe(succeeds);
     }
 

@@ -36,7 +36,7 @@ public sealed class AccountTests
     [InlineData(AccountType.Expense)]
     [InlineData(AccountType.Income)]
     [InlineData(AccountType.Liability)]
-    public void A_internal_account_can_go_negative(AccountType type)
+    public void An_internal_account_can_go_negative(AccountType type)
     {
         var account = Account.OpenInternalAccount(type, Currency.TRY);
         account.AllowsNegativeBalance.ShouldBeTrue();

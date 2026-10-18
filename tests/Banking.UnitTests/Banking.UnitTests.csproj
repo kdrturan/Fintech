@@ -4,7 +4,4 @@
     <ProjectReference Include="..\..\src\Modules\Ledger\Banking.Modules.Ledger.Domain\Banking.Modules.Ledger.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\Transfers\Banking.Modules.Transfers.Domain\Banking.Modules.Transfers.Domain.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Transfer\" />
-  </ItemGroup>
 </Project>
