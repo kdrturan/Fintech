@@ -24,7 +24,7 @@ A **modular monolith**: one deployable application whose modules are isolated as
                                         +--------------+
 ```
 
-The **Ledger** is the single place where money moves: it applies balanced journal entries atomically and idempotently. Business modules such as **Transfers** (and later Payments) own workflows and ask the Ledger to post. See [ADR 0003](docs/adr/0003-modular-monolith-with-ledger-as-posting-engine.md) for the reasoning and the alternatives that were rejected.
+The **Ledger** is the single place where money moves: it applies balanced journal entries atomically, and idempotently once the database enforces it in phase 2 ([ADR 0009](docs/adr/0009-double-entry-ledger-model.md)). Business modules such as **Transfers** (and later Payments) own workflows and ask the Ledger to post. See [ADR 0003](docs/adr/0003-modular-monolith-with-ledger-as-posting-engine.md) for the reasoning and the alternatives that were rejected.
 
 Module boundaries are enforced by [architecture tests](tests/Banking.ArchitectureTests) that inspect the compiled assemblies, not by convention. HTTP endpoints are written as controllers, owned by each module ([ADR 0005](docs/adr/0005-use-controllers-for-http-endpoints.md)).
 
@@ -68,3 +68,7 @@ The API listens on `http://localhost:5104`. Liveness check: `GET /health`. The O
 | [0003](docs/adr/0003-modular-monolith-with-ledger-as-posting-engine.md) | Modular monolith with the Ledger as a posting engine |
 | [0004](docs/adr/0004-build-and-test-tooling.md) | Build and test tooling |
 | [0005](docs/adr/0005-use-controllers-for-http-endpoints.md) | Use controllers for HTTP endpoints |
+| [0006](docs/adr/0006-money-representation-and-rounding.md) | Money: representation, rounding and where it lives |
+| [0007](docs/adr/0007-results-for-business-outcomes.md) | Results for business outcomes, exceptions for bugs |
+| [0008](docs/adr/0008-identifiers.md) | Identifiers: UUIDv7 and strongly typed ids |
+| [0009](docs/adr/0009-double-entry-ledger-model.md) | Double-entry ledger model |
