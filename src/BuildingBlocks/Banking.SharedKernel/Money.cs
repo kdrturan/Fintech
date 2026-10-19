@@ -10,7 +10,9 @@ public sealed record Money : IComparable<Money>
 {
     private Money(decimal amount, Currency currency)
     {
-        Amount = amount;
+        // Always exactly the currency's number of decimal places, whatever the source: 100 and 100.0000
+        // (as PostgreSQL returns numeric(19,4)) both become 100.00 TRY. The value never changes.
+        Amount = decimal.Round(amount * 1.0000m, currency.MinorUnits);
         Currency = currency;
     }
 

@@ -8,11 +8,19 @@ namespace Banking.Modules.Ledger.Domain;
 /// </summary>
 public sealed class JournalEntry
 {
-    private JournalEntry(JournalEntryId id, Guid idempotencyKey, IReadOnlyList<Posting> postings)
+    private readonly List<Posting> _postings;
+
+    private JournalEntry(JournalEntryId id, Guid idempotencyKey, List<Posting> postings)
     {
         Id = id;
         IdempotencyKey = idempotencyKey;
-        Postings = postings;
+        _postings = postings;
+    }
+
+    /// <summary>For EF Core, which creates the entry first and then loads its postings into the list.</summary>
+    private JournalEntry(JournalEntryId id, Guid idempotencyKey)
+        : this(id, idempotencyKey, [])
+    {
     }
 
     public JournalEntryId Id { get; }
@@ -20,7 +28,8 @@ public sealed class JournalEntry
     /// <summary>Identifies the business operation (for example the transfer id), so posting it twice can be detected.</summary>
     public Guid IdempotencyKey { get; }
 
-    public IReadOnlyList<Posting> Postings { get; }
+    /// <summary>A read-only view: casting it back to a list and changing it is not possible.</summary>
+    public IReadOnlyList<Posting> Postings => _postings.AsReadOnly();
 
     public Currency Currency => Postings[0].Amount.Currency;
 

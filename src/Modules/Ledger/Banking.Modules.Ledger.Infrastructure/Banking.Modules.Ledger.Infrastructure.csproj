@@ -1,5 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <ItemGroup Label="Data">
+    <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Banking.Modules.Ledger.Application\Banking.Modules.Ledger.Application.csproj" />
   </ItemGroup>
+  
 </Project>
