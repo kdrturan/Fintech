@@ -31,6 +31,34 @@ public sealed class MoneyInputTests
         Should.Throw<ArgumentException>(() => Currency.FromCode("XYZ"));
     }
 
+    [Fact]
+    public void Valid_input_creates_money()
+    {
+        var result = Money.TryCreate(10.50m, "TRY");
+
+        result.Value.ShouldBe(Money.Of(10.50m, Currency.TRY));
+    }
+
+    [Theory]
+    [InlineData("10.005", "TRY")]
+    [InlineData("1.5", "JPY")]
+    public void Too_many_decimal_places_are_a_validation_error(string amount, string currency)
+    {
+        var result = Money.TryCreate(decimal.Parse(amount, CultureInfo.InvariantCulture), currency);
+
+        result.Error!.Code.ShouldBe("money.too_many_decimal_places");
+        result.Error.Type.ShouldBe(ErrorType.Validation);
+    }
+
+    [Fact]
+    public void An_unknown_currency_is_a_validation_error()
+    {
+        var result = Money.TryCreate(10m, "XYZ");
+
+        result.Error!.Code.ShouldBe("money.unknown_currency");
+        result.Error.Type.ShouldBe(ErrorType.Validation);
+    }
+
     [Theory]
     [InlineData("100", "TRY", "100.00")]
     [InlineData("100.0000", "TRY", "100.00")]
@@ -40,5 +68,11 @@ public sealed class MoneyInputTests
         var money = Money.Of(decimal.Parse(amount, CultureInfo.InvariantCulture), Currency.FromCode(currency));
 
         money.Amount.ToString(CultureInfo.InvariantCulture).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void An_error_is_a_business_rule_unless_it_says_otherwise()
+    {
+        new Error("sample.error", "Something expected went wrong.").Type.ShouldBe(ErrorType.BusinessRule);
     }
 }
