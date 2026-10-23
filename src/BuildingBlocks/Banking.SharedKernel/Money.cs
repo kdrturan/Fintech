@@ -41,6 +41,25 @@ public sealed record Money : IComparable<Money>
         return new Money(amount, currency);
     }
 
+    /// <summary>
+    /// Creates money from user input: an unknown currency or too many decimal places is a validation error, not a bug.
+    /// Code that builds amounts itself uses <see cref="Of"/>, which throws.
+    /// </summary>
+    public static Result<Money> TryCreate(decimal amount, string? currencyCode)
+    {
+        if (!Currency.TryFromCode(currencyCode, out var currency))
+        {
+            return MoneyErrors.UnknownCurrency(currencyCode);
+        }
+
+        if (decimal.Round(amount, currency.MinorUnits) != amount)
+        {
+            return MoneyErrors.TooManyDecimalPlaces(currency);
+        }
+
+        return new Money(amount, currency);
+    }
+
     public static Money Zero(Currency currency) => Of(0m, currency);
 
     /// <summary>

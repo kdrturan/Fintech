@@ -1,3 +1,6 @@
+using Banking.Modules.Ledger.Application;
+using Banking.Modules.Ledger.Application.Abstractions;
+using Banking.Modules.Ledger.Contracts;
 using Banking.Modules.Ledger.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +15,11 @@ public static class LedgerModule
         services.AddDbContext<LedgerDbContext>(options => options
             .UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", LedgerDbContext.Schema))
             .UseSnakeCaseNamingConvention());
+
+        services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<ILedgerPoster, LedgerPoster>();
+        services.AddScoped<ILedgerApi, LedgerApi>();
+
         return services;
     }
 

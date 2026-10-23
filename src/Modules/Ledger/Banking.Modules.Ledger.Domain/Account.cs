@@ -28,6 +28,12 @@ public sealed class Account
 
     public Money Balance { get; private set; }
 
+    /// <summary>
+    /// An account that belongs to a customer, as opened by <see cref="OpenCustomerAccount"/>. Only these accounts
+    /// may be used by customer-facing operations; the bank's own accounts are never exposed through the API.
+    /// </summary>
+    public bool IsCustomerAccount => Type == AccountType.Liability && !AllowsNegativeBalance;
+
     /// <summary>A customer's deposit account. From the bank's point of view it is a liability.</summary>
     public static Account OpenCustomerAccount(Currency currency) =>
         new(AccountId.New(), AccountType.Liability, currency, allowsNegativeBalance: false);
