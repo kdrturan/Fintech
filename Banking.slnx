@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/src/BuildingBlocks/">
     <Project Path="src/BuildingBlocks/Banking.SharedKernel/Banking.SharedKernel.csproj" Id="11b82179-96bd-493c-b767-45f6d34fd0fe" />
+    <Project Path="src/BuildingBlocks/Banking.Web/Banking.Web.csproj" Id="b60f704a-5803-4f66-938a-a0bbf99ab5ad" />
   </Folder>
   <Folder Name="/src/Modules/" />
   <Folder Name="/src/Modules/Ledger/">
@@ -11,6 +12,7 @@
     <Project Path="src/Modules/Ledger/Banking.Modules.Ledger.Contracts/Banking.Modules.Ledger.Contracts.csproj" Id="fd92834f-ee4a-46cb-aa40-483a4bd44062" />
     <Project Path="src/Modules/Ledger/Banking.Modules.Ledger.Domain/Banking.Modules.Ledger.Domain.csproj" Id="b184ddd1-3fea-4133-804e-c9125144d019" />
     <Project Path="src/Modules/Ledger/Banking.Modules.Ledger.Infrastructure/Banking.Modules.Ledger.Infrastructure.csproj" Id="43c52fb3-d92d-4293-b0cf-4484010d26b5" />
+    <Project Path="src/Modules/Ledger/Banking.Modules.Ledger.Presentation/Banking.Modules.Ledger.Presentation.csproj" Id="272d46bd-f422-4c93-9ceb-622390fbee17" />
   </Folder>
   <Folder Name="/src/Modules/Transfers/">
     <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Application/Banking.Modules.Transfers.Application.csproj" Id="93cb61cb-7b40-4fd2-ac61-23daf72cc171" />

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Banking.Modules.Ledger.Application;
 using Banking.Modules.Ledger.Application.Abstractions;
 using Banking.Modules.Ledger.Contracts;
@@ -10,6 +11,9 @@ namespace Banking.Modules.Ledger.Infrastructure;
 /// <summary>The Ledger module's entry point for the host: everything it registers and owns.</summary>
 public static class LedgerModule
 {
+    /// <summary>Lets the host register the module's MediatR handlers without referencing the Application project.</summary>
+    public static Assembly ApplicationAssembly => typeof(LedgerApi).Assembly;
+
     public static IServiceCollection AddLedgerModule(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<LedgerDbContext>(options => options
