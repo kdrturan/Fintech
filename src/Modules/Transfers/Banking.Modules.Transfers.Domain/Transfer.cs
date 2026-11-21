@@ -17,6 +17,15 @@ public sealed class Transfer
         Status = TransferStatus.Pending;
     }
 
+    /// <summary>
+    /// For EF Core only: it cannot pass <see cref="Amount"/> to a constructor, so it creates the transfer
+    /// empty and then sets every property. Private, so no code can create a transfer that skipped the rules.
+    /// </summary>
+    private Transfer()
+    {
+        Amount = null!;
+    }
+
     public TransferId Id { get; }
 
     /// <summary>

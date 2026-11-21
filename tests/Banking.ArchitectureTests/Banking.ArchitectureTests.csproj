@@ -12,5 +12,6 @@
     <ProjectReference Include="..\..\src\Modules\Transfers\Banking.Modules.Transfers.Contracts\Banking.Modules.Transfers.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Modules\Transfers\Banking.Modules.Transfers.Domain\Banking.Modules.Transfers.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\Transfers\Banking.Modules.Transfers.Infrastructure\Banking.Modules.Transfers.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Transfers\Banking.Modules.Transfers.Presentation\Banking.Modules.Transfers.Presentation.csproj" />
   </ItemGroup>
 </Project>

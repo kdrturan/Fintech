@@ -3,7 +3,7 @@
 ### Health
 GET {{host}}/health
 
-### Open an account (copy the "id" from the response into @ahmet below)
+### Open an account (copy the "id" from the response into @ahmet / @ayse below)
 POST {{host}}/accounts
 Content-Type: application/json
 
@@ -11,6 +11,7 @@ Content-Type: application/json
 
 ###
 @ahmet = 00000000-0000-0000-0000-000000000000
+@ayse = 00000000-0000-0000-0000-000000000000
 
 ### Pay in 100 TL
 POST {{host}}/accounts/{{ahmet}}/deposits
@@ -20,3 +21,15 @@ Content-Type: application/json
 
 ### Balance
 GET {{host}}/accounts/{{ahmet}}
+
+### Transfer 30 TL (copy the "id" from the response, or "transferId" from a 422, into @transfer below)
+POST {{host}}/transfers
+Content-Type: application/json
+
+{ "sourceAccountId": "{{ahmet}}", "destinationAccountId": "{{ayse}}", "amount": 30.00, "currency": "TRY" }
+
+###
+@transfer = 00000000-0000-0000-0000-000000000000
+
+### Transfer status
+GET {{host}}/transfers/{{transfer}}

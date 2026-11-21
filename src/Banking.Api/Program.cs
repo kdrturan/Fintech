@@ -1,5 +1,7 @@
 using Banking.Modules.Ledger.Infrastructure;
 using Banking.Modules.Ledger.Presentation;
+using Banking.Modules.Transfers.Infrastructure;
+using Banking.Modules.Transfers.Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,19 +16,21 @@ builder.Services.AddProblemDetails();
 
 // Each module brings its controllers from its own Presentation project.
 builder.Services.AddControllers()
-    .AddApplicationPart(typeof(AccountsController).Assembly);
+    .AddApplicationPart(typeof(AccountsController).Assembly)
+    .AddApplicationPart(typeof(TransfersController).Assembly);
 
 builder.Services.AddMediatR(options =>
 {
     // The key comes from user-secrets or an environment variable (MediatR__LicenseKey), never from the repository.
     options.LicenseKey = builder.Configuration["MediatR:LicenseKey"];
-    options.RegisterServicesFromAssemblies(LedgerModule.ApplicationAssembly);
+    options.RegisterServicesFromAssemblies(LedgerModule.ApplicationAssembly, TransfersModule.ApplicationAssembly);
 });
 
 var connectionString = builder.Configuration.GetConnectionString("Banking")
     ?? throw new InvalidOperationException("Connection string 'Banking' is not configured.");
 
 builder.Services.AddLedgerModule(connectionString);
+builder.Services.AddTransfersModule(connectionString);
 
 var app = builder.Build();
 

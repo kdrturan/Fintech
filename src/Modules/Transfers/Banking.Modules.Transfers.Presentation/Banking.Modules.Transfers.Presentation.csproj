@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- HTTP only: controllers and request types. Talks to the module through MediatR, never to its database. -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Banking.Modules.Transfers.Application/Banking.Modules.Transfers.Application.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/Banking.Web/Banking.Web.csproj" />
+  </ItemGroup>
+
+</Project>

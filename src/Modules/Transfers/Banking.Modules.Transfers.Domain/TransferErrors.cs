@@ -9,4 +9,7 @@ public static class TransferErrors
 
     public static Error SameAccount { get; } =
         new("transfers.same_account", "The source and destination accounts must be different.");
+
+    public static Error NotFound(TransferId id) =>
+        new("transfers.not_found", $"Transfer {id} does not exist.", ErrorType.NotFound);
 }

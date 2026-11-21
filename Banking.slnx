@@ -19,6 +19,7 @@
     <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Contracts/Banking.Modules.Transfers.Contracts.csproj" Id="b1d362dd-b44b-4423-804d-dd57f779eeb5" />
     <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Domain/Banking.Modules.Transfers.Domain.csproj" Id="9c385783-1976-4f84-b3ae-d6ccee7ff210" />
     <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Infrastructure/Banking.Modules.Transfers.Infrastructure.csproj" Id="b94b53b6-9a50-4815-9111-8a78b3ce5e00" />
+    <Project Path="src/Modules/Transfers/Banking.Modules.Transfers.Presentation/Banking.Modules.Transfers.Presentation.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />

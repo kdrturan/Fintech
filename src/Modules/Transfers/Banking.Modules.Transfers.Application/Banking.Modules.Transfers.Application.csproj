@@ -1,4 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Ledger\Banking.Modules.Ledger.Contracts\Banking.Modules.Ledger.Contracts.csproj" />
     <ProjectReference Include="..\Banking.Modules.Transfers.Contracts\Banking.Modules.Transfers.Contracts.csproj" />
