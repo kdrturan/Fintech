@@ -6,6 +6,7 @@ namespace Banking.IntegrationTests;
 
 public sealed record AccountDto(Guid Id, string Currency, decimal Balance);
 
+public sealed record TransferDto(Guid Id, Guid SourceAccountId, Guid DestinationAccountId, decimal Amount, string Currency, string Status, string? FailureReason);
 
 /// <summary>Calls the API the way a client would. Every money-moving call sends a fresh Idempotency-Key unless one is given.</summary>
 public sealed class BankingClient(HttpClient http)
@@ -36,6 +37,12 @@ public sealed class BankingClient(HttpClient http)
 
     public Task<HttpResponseMessage> DepositAsync(Guid accountId, decimal amount, string currency = "TRY", string? idempotencyKey = null) =>
         PostAsync($"/accounts/{accountId}/deposits", new { amount, currency }, idempotencyKey ?? NewKey());
+
+    public Task<HttpResponseMessage> TransferAsync(Guid from, Guid to, decimal amount, string currency = "TRY", string? idempotencyKey = null) =>
+        PostAsync("/transfers", new { sourceAccountId = from, destinationAccountId = to, amount, currency }, idempotencyKey ?? NewKey());
+
+    public async Task<TransferDto> GetTransferAsync(Guid id) =>
+        (await http.GetFromJsonAsync<TransferDto>($"/transfers/{id}", Cancellation))!;
 
     public static string NewKey() => Guid.NewGuid().ToString();
 

@@ -1,4 +1,5 @@
 using Banking.Modules.Ledger.Infrastructure;
+using Banking.Modules.Transfers.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Testcontainers.PostgreSql;
@@ -32,11 +33,13 @@ public sealed class PostgresFixture : IAsyncLifetime
 
         var services = new ServiceCollection()
             .AddLedgerModule(template)
+            .AddTransfersModule(template)
             .BuildServiceProvider();
 
         await using (services)
         {
             await services.MigrateLedgerDatabaseAsync(CancellationToken.None);
+            await services.MigrateTransfersDatabaseAsync(CancellationToken.None);
         }
 
         // PostgreSQL refuses to copy a database that has open connections, and the pool keeps them open.
