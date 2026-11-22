@@ -1,5 +1,6 @@
 using Banking.Modules.Ledger.Infrastructure;
 using Banking.Modules.Transfers.Infrastructure;
+using Banking.Web.Idempotency;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Testcontainers.PostgreSql;
@@ -32,12 +33,14 @@ public sealed class PostgresFixture : IAsyncLifetime
         var template = ConnectionStringFor(TemplateDatabase);
 
         var services = new ServiceCollection()
+            .AddIdempotency(template)
             .AddLedgerModule(template)
             .AddTransfersModule(template)
             .BuildServiceProvider();
 
         await using (services)
         {
+            await services.MigrateIdempotencyDatabaseAsync(CancellationToken.None);
             await services.MigrateLedgerDatabaseAsync(CancellationToken.None);
             await services.MigrateTransfersDatabaseAsync(CancellationToken.None);
         }

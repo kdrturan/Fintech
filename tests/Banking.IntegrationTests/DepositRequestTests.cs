@@ -12,10 +12,14 @@ public sealed class DepositRequestTests(BankingApiFactory api) : IClassFixture<B
     {
         var account = await _client.OpenAccountAsync();
 
-        using var response = await _client.Http.PostAsJsonAsync(
-            $"/accounts/{account.Id}/deposits",
-            new { currency = "TRY" },
-            TestContext.Current.CancellationToken);
+        // With a key: without one, the idempotency filter answers 400 key_missing before model validation runs.
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"/accounts/{account.Id}/deposits")
+        {
+            Content = JsonContent.Create(new { currency = "TRY" }),
+        };
+        request.Headers.Add("Idempotency-Key", BankingClient.NewKey());
+
+        using var response = await _client.Http.SendAsync(request, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         var problem = await BankingClient.ProblemAsync(response);
