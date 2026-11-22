@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+// One clock for the whole application; tests can replace it.
+builder.Services.AddSingleton(TimeProvider.System);
+
 builder.Services.AddHealthChecks();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -33,7 +36,7 @@ var connectionString = builder.Configuration.GetConnectionString("Banking")
 // Stores Idempotency-Key requests for every module's [Idempotent] endpoints, in its own schema.
 builder.Services.AddIdempotency(connectionString);
 builder.Services.AddLedgerModule(connectionString);
-builder.Services.AddTransfersModule(connectionString);
+builder.Services.AddTransfersModule(connectionString, builder.Configuration);
 
 var app = builder.Build();
 

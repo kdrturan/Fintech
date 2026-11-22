@@ -5,6 +5,11 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
 
+  <ItemGroup Label="Hosting">
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.13" />
+  </ItemGroup>
+
   <ItemGroup Label="Application">
     <!-- 13+ is dual licensed; the free Community license needs a key, which never goes into the repository. See docs/adr. -->
     <PackageVersion Include="MediatR" Version="14.2.0" />

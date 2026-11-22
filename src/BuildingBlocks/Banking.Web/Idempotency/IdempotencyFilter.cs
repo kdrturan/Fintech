@@ -52,19 +52,22 @@ internal sealed class IdempotencyFilter(IdempotencyStore store, IOptions<JsonOpt
 
         var executed = await next();
 
-        if ((executed.Exception is not null && !executed.ExceptionHandled) || executed.Result is not IStatusCodeActionResult result)
+        if (executed.Exception is not null && !executed.ExceptionHandled)
         {
-            // Unexpected failure: nothing meaningful to replay, so the client may retry with the same key.
+            // The handler may have moved money before it failed, so a retry must not run it again: the failure is
+            // stored and replayed like any other outcome, and the recovery job finishes the transfer. See docs/adr/0012.
+            await store.CompleteAsync(key, StatusCodes.Status500InternalServerError, contentType: null, body: null, CancellationToken.None);
+            return;
+        }
+
+        if (executed.Result is not IStatusCodeActionResult result)
+        {
+            // Nothing says what happened: give the key back so the client can retry it.
             await store.ReleaseAsync(key);
             return;
         }
 
         var statusCode = result.StatusCode ?? StatusCodes.Status200OK;
-        if (statusCode >= StatusCodes.Status500InternalServerError)
-        {
-            await store.ReleaseAsync(key);
-            return;
-        }
 
         var (contentType, body) = Serialize(executed.Result);
         await store.CompleteAsync(key, statusCode, contentType, body, CancellationToken.None);
