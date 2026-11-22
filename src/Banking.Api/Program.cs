@@ -2,6 +2,7 @@ using Banking.Modules.Ledger.Infrastructure;
 using Banking.Modules.Ledger.Presentation;
 using Banking.Modules.Transfers.Infrastructure;
 using Banking.Modules.Transfers.Presentation;
+using Banking.Web.Idempotency;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,8 @@ builder.Services.AddMediatR(options =>
 var connectionString = builder.Configuration.GetConnectionString("Banking")
     ?? throw new InvalidOperationException("Connection string 'Banking' is not configured.");
 
+// Stores Idempotency-Key requests for every module's [Idempotent] endpoints, in its own schema.
+builder.Services.AddIdempotency(connectionString);
 builder.Services.AddLedgerModule(connectionString);
 builder.Services.AddTransfersModule(connectionString);
 

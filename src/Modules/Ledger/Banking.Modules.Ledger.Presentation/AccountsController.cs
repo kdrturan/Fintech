@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Banking.Modules.Ledger.Application.Accounts;
 using Banking.Web.Errors;
+using Banking.Web.Idempotency;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,7 @@ public sealed class AccountsController(ISender sender) : ControllerBase
 
     /// <summary>Cash paid in for the customer. Moves money, so a retry must never pay in twice.</summary>
     [HttpPost("{id:guid}/deposits")]
+    [Idempotent]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

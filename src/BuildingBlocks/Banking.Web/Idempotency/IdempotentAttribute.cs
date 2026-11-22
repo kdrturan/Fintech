@@ -1,0 +1,17 @@
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Banking.Web.Idempotency;
+
+/// <summary>
+/// Requires an <c>Idempotency-Key</c> header and replays the first response for retries with the same key.
+/// Put it on POST actions that create something or move money.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
+public sealed class IdempotentAttribute : Attribute, IFilterFactory
+{
+    public bool IsReusable => false;
+
+    public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
+        serviceProvider.GetRequiredService<IdempotencyFilter>();
+}
