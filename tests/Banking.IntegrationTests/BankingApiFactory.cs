@@ -16,6 +16,7 @@ public sealed class BankingApiFactory(PostgresFixture postgres) : WebApplication
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseSetting("ConnectionStrings:Banking", ConnectionString);
+        builder.UseSetting("TransferRecovery:Enabled", "false");
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync() => await base.DisposeAsync();
