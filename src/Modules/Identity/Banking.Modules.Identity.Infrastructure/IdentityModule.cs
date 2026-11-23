@@ -2,6 +2,7 @@ using System.Reflection;
 using Banking.Modules.Identity.Application;
 using Banking.Modules.Identity.Application.Abstractions;
 using Banking.Modules.Identity.Infrastructure.Persistence;
+using Banking.Modules.Identity.Infrastructure.Sessions;
 using Banking.Modules.Identity.Infrastructure.Tokens;
 using Banking.Modules.Identity.Infrastructure.Users;
 using Microsoft.AspNetCore.Identity;
@@ -38,8 +39,14 @@ public static class IdentityModule
             .Validate(options => options.AccessTokenLifetime > TimeSpan.Zero, "Jwt:AccessTokenLifetime must be positive.")
             .ValidateOnStart();
 
+        services.AddOptions<RefreshTokenOptions>()
+            .Bind(configuration.GetSection(RefreshTokenOptions.SectionName))
+            .Validate(options => options.Lifetime > TimeSpan.Zero, "RefreshToken:Lifetime must be positive.")
+            .ValidateOnStart();
+
         services.AddSingleton<IAccessTokenIssuer, JwtAccessTokenIssuer>();
         services.AddScoped<IUserAccounts, UserAccounts>();
+        services.AddScoped<ISessions, SessionStore>();
 
         return services;
     }

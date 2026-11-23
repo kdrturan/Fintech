@@ -1,4 +1,5 @@
 using Banking.Modules.Identity.Contracts;
+using Banking.Modules.Identity.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ namespace Banking.Modules.Identity.Infrastructure.Persistence;
 
 /// <summary>
 /// The Identity module's tables, all in its own <c>identity</c> schema. ASP.NET Core Identity defines them;
-/// this context only renames them and seeds the roles. Named after the module so it is not confused with
+/// this context renames them, seeds the roles and adds the module's own sessions and refresh tokens. Named after the module so it is not confused with
 /// Identity's own <c>IdentityDbContext</c>, which it extends.
 /// </summary>
 public sealed class IdentityModuleDbContext(DbContextOptions<IdentityModuleDbContext> options)
@@ -21,6 +22,10 @@ public sealed class IdentityModuleDbContext(DbContextOptions<IdentityModuleDbCon
         new() { Id = new Guid("01937a2c-0000-7000-8000-000000000001"), Name = IdentityRoles.Customer, NormalizedName = "CUSTOMER", ConcurrencyStamp = "customer" },
         new() { Id = new Guid("01937a2c-0000-7000-8000-000000000002"), Name = IdentityRoles.Teller, NormalizedName = "TELLER", ConcurrencyStamp = "teller" },
     ];
+
+    public DbSet<Session> Sessions => Set<Session>();
+
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -51,5 +56,8 @@ public sealed class IdentityModuleDbContext(DbContextOptions<IdentityModuleDbCon
         builder.Entity<IdentityUserLogin<Guid>>().ToTable("user_logins");
         builder.Entity<IdentityUserToken<Guid>>().ToTable("user_tokens");
         builder.Entity<IdentityRoleClaim<Guid>>().ToTable("role_claims");
+
+        // Last, so that constraint names are built from the renamed tables.
+        builder.ApplyConfigurationsFromAssembly(typeof(IdentityModuleDbContext).Assembly);
     }
 }

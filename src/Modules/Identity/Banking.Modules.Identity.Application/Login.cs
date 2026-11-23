@@ -4,13 +4,12 @@ using MediatR;
 
 namespace Banking.Modules.Identity.Application;
 
-public sealed record LoginCommand(string Email, string Password) : IRequest<Result<LoginResponse>>;
+public sealed record LoginCommand(string Email, string Password) : IRequest<Result<TokenResponse>>;
 
-public sealed record LoginResponse(string AccessToken, string TokenType, DateTimeOffset ExpiresAt);
-
-public sealed class LoginHandler(IUserAccounts accounts, IAccessTokenIssuer tokens) : IRequestHandler<LoginCommand, Result<LoginResponse>>
+public sealed class LoginHandler(IUserAccounts accounts, ISessions sessions, IAccessTokenIssuer tokens)
+    : IRequestHandler<LoginCommand, Result<TokenResponse>>
 {
-    public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<Result<TokenResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -20,7 +19,7 @@ public sealed class LoginHandler(IUserAccounts accounts, IAccessTokenIssuer toke
             return signedIn.Error!;
         }
 
-        var token = tokens.Issue(signedIn.Value.Id, signedIn.Value.Roles);
-        return new LoginResponse(token.Token, "Bearer", token.ExpiresAt);
+        var refreshToken = await sessions.StartAsync(signedIn.Value.Id, cancellationToken);
+        return TokenResponse.From(tokens.Issue(signedIn.Value.Id, signedIn.Value.Roles), refreshToken);
     }
 }

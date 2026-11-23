@@ -14,6 +14,10 @@ public static class IdentityErrors
     public static Error LockedOut { get; } =
         new("auth.locked_out", "Too many wrong passwords. Try again in 15 minutes.", ErrorType.Unauthorized);
 
+    /// <summary>The same answer whether the token is unknown, expired, revoked or reused: a thief learns nothing from it.</summary>
+    public static Error InvalidRefreshToken { get; } =
+        new("auth.invalid_refresh_token", "The refresh token is not valid. Sign in again.", ErrorType.Unauthorized);
+
     public static Error EmailTaken { get; } =
         new("auth.email_taken", "An account with this e-mail address already exists.", ErrorType.Conflict);
 
