@@ -8,6 +8,12 @@ public sealed record AccountDto(Guid Id, string Currency, decimal Balance);
 
 public sealed record TransferDto(Guid Id, Guid SourceAccountId, Guid DestinationAccountId, decimal Amount, string Currency, string Status, string? FailureReason);
 
+public sealed record RegisteredUserDto(Guid Id, string Email);
+
+public sealed record LoginDto(string AccessToken, string TokenType, DateTimeOffset ExpiresAt);
+
+public sealed record MeDto(Guid Id, string Email, string[] Roles);
+
 /// <summary>Calls the API the way a client would. Every money-moving call sends a fresh Idempotency-Key unless one is given.</summary>
 public sealed class BankingClient(HttpClient http)
 {

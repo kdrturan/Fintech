@@ -36,7 +36,7 @@ public sealed class PostgresFixture : IAsyncLifetime
 
         var services = new ServiceCollection()
             .AddIdempotency(template)
-            .AddIdentityModule(template)
+            .AddIdentityModule(template, new ConfigurationBuilder().Build())
             .AddLedgerModule(template)
             .AddTransfersModule(template, new ConfigurationBuilder().Build())
             .BuildServiceProvider();
