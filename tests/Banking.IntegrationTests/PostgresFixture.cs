@@ -1,3 +1,4 @@
+using Banking.Modules.Identity.Infrastructure;
 using Banking.Modules.Ledger.Infrastructure;
 using Banking.Modules.Transfers.Infrastructure;
 using Banking.Web.Idempotency;
@@ -35,6 +36,7 @@ public sealed class PostgresFixture : IAsyncLifetime
 
         var services = new ServiceCollection()
             .AddIdempotency(template)
+            .AddIdentityModule(template)
             .AddLedgerModule(template)
             .AddTransfersModule(template, new ConfigurationBuilder().Build())
             .BuildServiceProvider();
@@ -42,6 +44,7 @@ public sealed class PostgresFixture : IAsyncLifetime
         await using (services)
         {
             await services.MigrateIdempotencyDatabaseAsync(CancellationToken.None);
+            await services.MigrateIdentityDatabaseAsync(CancellationToken.None);
             await services.MigrateLedgerDatabaseAsync(CancellationToken.None);
             await services.MigrateTransfersDatabaseAsync(CancellationToken.None);
         }
