@@ -10,7 +10,7 @@ public sealed record TransferDto(Guid Id, Guid SourceAccountId, Guid Destination
 
 public sealed record RegisteredUserDto(Guid Id, string Email);
 
-public sealed record LoginDto(string AccessToken, string TokenType, DateTimeOffset ExpiresAt);
+public sealed record LoginDto(string AccessToken, string TokenType, DateTimeOffset ExpiresAt, string RefreshToken, DateTimeOffset RefreshTokenExpiresAt);
 
 public sealed record MeDto(Guid Id, string Email, string[] Roles);
 
