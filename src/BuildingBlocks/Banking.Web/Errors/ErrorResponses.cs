@@ -20,6 +20,7 @@ public static class ErrorResponses
         ErrorType.Validation => StatusCodes.Status400BadRequest,
         ErrorType.NotFound => StatusCodes.Status404NotFound,
         ErrorType.Conflict => StatusCodes.Status409Conflict,
+        ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
         ErrorType.BusinessRule => StatusCodes.Status422UnprocessableEntity,
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown error type."),
     };
@@ -62,6 +63,7 @@ public static class ErrorResponses
         ErrorType.Validation => "The request is not valid.",
         ErrorType.NotFound => "The resource was not found.",
         ErrorType.Conflict => "The request conflicts with the current state.",
+        ErrorType.Unauthorized => "Authentication failed.",
         _ => "The request cannot be completed.",
     };
 }

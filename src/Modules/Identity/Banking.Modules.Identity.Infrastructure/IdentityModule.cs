@@ -1,6 +1,12 @@
+using System.Reflection;
+using Banking.Modules.Identity.Application;
+using Banking.Modules.Identity.Application.Abstractions;
 using Banking.Modules.Identity.Infrastructure.Persistence;
+using Banking.Modules.Identity.Infrastructure.Tokens;
+using Banking.Modules.Identity.Infrastructure.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Banking.Modules.Identity.Infrastructure;
@@ -8,7 +14,10 @@ namespace Banking.Modules.Identity.Infrastructure;
 /// <summary>The Identity module's entry point for the host.</summary>
 public static class IdentityModule
 {
-    public static IServiceCollection AddIdentityModule(this IServiceCollection services, string connectionString)
+    /// <summary>Lets the host register the module's MediatR handlers without referencing the Application project.</summary>
+    public static Assembly ApplicationAssembly => typeof(RegisterHandler).Assembly;
+
+    public static IServiceCollection AddIdentityModule(this IServiceCollection services, string connectionString, IConfiguration configuration)
     {
         services.AddDbContext<IdentityModuleDbContext>(options => options
             .UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", IdentityModuleDbContext.Schema))
@@ -19,6 +28,18 @@ public static class IdentityModule
         services.AddIdentityCore<User>(ConfigurePolicy)
             .AddRoles<Role>()
             .AddEntityFrameworkStores<IdentityModuleDbContext>();
+
+        // OWASP's current figure for PBKDF2 with HMAC-SHA512; Identity's default is 100,000. A password hashed with
+        // fewer iterations is re-hashed with these the next time its owner signs in.
+        services.Configure<PasswordHasherOptions>(options => options.IterationCount = 210_000);
+
+        services.AddOptions<AccessTokenOptions>()
+            .Bind(configuration.GetSection(AccessTokenOptions.SectionName))
+            .Validate(options => options.AccessTokenLifetime > TimeSpan.Zero, "Jwt:AccessTokenLifetime must be positive.")
+            .ValidateOnStart();
+
+        services.AddSingleton<IAccessTokenIssuer, JwtAccessTokenIssuer>();
+        services.AddScoped<IUserAccounts, UserAccounts>();
 
         return services;
     }

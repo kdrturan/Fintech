@@ -1,10 +1,33 @@
 @host = http://localhost:5104
 
-### Health
+### Health (no token needed)
 GET {{host}}/health
+
+### Register a customer (no token needed)
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{ "email": "ahmet@example.com", "password": "Correct-Horse-9" }
+
+### Sign in, then copy "accessToken" from the response into @token below. It expires after 15 minutes.
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "email": "ahmet@example.com", "password": "Correct-Horse-9" }
+
+###
+@token = paste-the-access-token-here
+
+### Who am I?
+GET {{host}}/me
+Authorization: Bearer {{token}}
+
+### Without a token: 401
+GET {{host}}/me
 
 ### Open an account (copy the "id" from the response into @ahmet / @ayse below)
 POST {{host}}/accounts
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 { "currency": "TRY" }
@@ -15,6 +38,7 @@ Content-Type: application/json
 
 ### Pay in 100 TL. Send it twice with the same key: the balance grows once. Change the key for a new deposit.
 POST {{host}}/accounts/{{ahmet}}/deposits
+Authorization: Bearer {{token}}
 Content-Type: application/json
 Idempotency-Key: deposit-1
 
@@ -22,10 +46,12 @@ Idempotency-Key: deposit-1
 
 ### Balance
 GET {{host}}/accounts/{{ahmet}}
+Authorization: Bearer {{token}}
 
 ### Transfer 30 TL. Send it twice: the second answer is the first one replayed (Idempotent-Replayed: true).
 ### Change the key for a new transfer. Copy the "id", or "transferId" from a 422, into @transfer below.
 POST {{host}}/transfers
+Authorization: Bearer {{token}}
 Content-Type: application/json
 Idempotency-Key: transfer-1
 
@@ -33,6 +59,7 @@ Idempotency-Key: transfer-1
 
 ### Same key, different amount: 422 idempotency.key_reused
 POST {{host}}/transfers
+Authorization: Bearer {{token}}
 Content-Type: application/json
 Idempotency-Key: transfer-1
 
@@ -43,3 +70,4 @@ Idempotency-Key: transfer-1
 
 ### Transfer status
 GET {{host}}/transfers/{{transfer}}
+Authorization: Bearer {{token}}

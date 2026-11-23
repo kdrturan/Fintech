@@ -78,14 +78,16 @@ dotnet ef database update --project src/Modules/Ledger/Banking.Modules.Ledger.In
 dotnet ef database update --project src/Modules/Transfers/Banking.Modules.Transfers.Infrastructure --startup-project src/Banking.Api --context TransfersDbContext
 ```
 
-MediatR needs a license key (free Community license, [ADR 0015](docs/adr/0015-use-mediatr.md)). It never goes into the repository:
+Two secrets never go into the repository: a MediatR license key (free Community license, [ADR 0015](docs/adr/0015-use-mediatr.md)) and the RSA key that signs access tokens. The API refuses to start without the signing key. Generate one in PowerShell and store both with user-secrets:
 
-```bash
+```powershell
+$rsa = [System.Security.Cryptography.RSA]::Create(2048)
+dotnet user-secrets set "Jwt:SigningKey" ([Convert]::ToBase64String($rsa.ExportPkcs8PrivateKey())) --project src/Banking.Api
 dotnet user-secrets set "MediatR:LicenseKey" "<your key>" --project src/Banking.Api
 dotnet run --project src/Banking.Api
 ```
 
-The API listens on `http://localhost:5104`. Liveness check: `GET /health`. The OpenAPI document is served at `/openapi/v1.json` in Development. `src/Banking.Api/Banking.Api.http` contains ready-to-send requests.
+The API listens on `http://localhost:5104`. Liveness check: `GET /health`. The OpenAPI document is served at `/openapi/v1.json` in Development. `src/Banking.Api/Banking.Api.http` contains ready-to-send requests: register, sign in, then paste the access token into `@token`.
 
 ## API
 

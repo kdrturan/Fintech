@@ -14,4 +14,7 @@ public enum ErrorType
 
     /// <summary>The request conflicts with the current state, such as the same request still being processed.</summary>
     Conflict,
+
+    /// <summary>The caller could not be identified, such as a wrong password at sign-in.</summary>
+    Unauthorized,
 }

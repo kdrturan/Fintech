@@ -12,6 +12,7 @@
     <Project Path="src/Modules/Identity/Banking.Modules.Identity.Contracts/Banking.Modules.Identity.Contracts.csproj" />
     <Project Path="src/Modules/Identity/Banking.Modules.Identity.Domain/Banking.Modules.Identity.Domain.csproj" />
     <Project Path="src/Modules/Identity/Banking.Modules.Identity.Infrastructure/Banking.Modules.Identity.Infrastructure.csproj" />
+    <Project Path="src/Modules/Identity/Banking.Modules.Identity.Presentation/Banking.Modules.Identity.Presentation.csproj" />
   </Folder>
   <Folder Name="/src/Modules/Ledger/">
     <Project Path="src/Modules/Ledger/Banking.Modules.Ledger.Application/Banking.Modules.Ledger.Application.csproj" Id="a2e9ffe7-e5a1-40df-acf0-66f96526478b" />

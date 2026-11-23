@@ -9,6 +9,7 @@
   <!-- ASP.NET Core Identity's user store on EF Core. A NuGet package, so this project needs no ASP.NET Core framework reference. -->
   <ItemGroup Label="Identity">
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
   </ItemGroup>
 
   <ItemGroup>
