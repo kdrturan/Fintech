@@ -73,6 +73,7 @@ Migrations are applied as an explicit step, never at startup ([ADR 0010](docs/ad
 
 ```bash
 dotnet ef database update --project src/BuildingBlocks/Banking.Web --startup-project src/Banking.Api --context IdempotencyDbContext
+dotnet ef database update --project src/Modules/Identity/Banking.Modules.Identity.Infrastructure --startup-project src/Banking.Api --context IdentityModuleDbContext
 dotnet ef database update --project src/Modules/Ledger/Banking.Modules.Ledger.Infrastructure --startup-project src/Banking.Api --context LedgerDbContext
 dotnet ef database update --project src/Modules/Transfers/Banking.Modules.Transfers.Infrastructure --startup-project src/Banking.Api --context TransfersDbContext
 ```

@@ -1,3 +1,4 @@
+using Banking.Modules.Identity.Infrastructure;
 using Banking.Modules.Ledger.Infrastructure;
 using Banking.Modules.Ledger.Presentation;
 using Banking.Modules.Transfers.Infrastructure;
@@ -35,6 +36,7 @@ var connectionString = builder.Configuration.GetConnectionString("Banking")
 
 // Stores Idempotency-Key requests for every module's [Idempotent] endpoints, in its own schema.
 builder.Services.AddIdempotency(connectionString);
+builder.Services.AddIdentityModule(connectionString);
 builder.Services.AddLedgerModule(connectionString);
 builder.Services.AddTransfersModule(connectionString, builder.Configuration);
 

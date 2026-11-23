@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks\Banking.Web\Banking.Web.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Banking.Modules.Identity.Infrastructure\Banking.Modules.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Ledger\Banking.Modules.Ledger.Infrastructure\Banking.Modules.Ledger.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Ledger\Banking.Modules.Ledger.Presentation\Banking.Modules.Ledger.Presentation.csproj" />
     <ProjectReference Include="..\Modules\Transfers\Banking.Modules.Transfers.Infrastructure\Banking.Modules.Transfers.Infrastructure.csproj" />

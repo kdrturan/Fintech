@@ -10,6 +10,11 @@
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.13" />
   </ItemGroup>
 
+  <ItemGroup Label="Identity">
+    <!-- An ASP.NET Core package: kept on the same patch as the other ASP.NET Core packages and the runtime. -->
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.12" />
+  </ItemGroup>
+
   <ItemGroup Label="Application">
     <!-- 13+ is dual licensed; the free Community license needs a key, which never goes into the repository. See docs/adr. -->
     <PackageVersion Include="MediatR" Version="14.2.0" />
