@@ -15,11 +15,15 @@ namespace Banking.Modules.Ledger.Presentation;
 [Route("accounts")]
 public sealed class AccountsController(ISender sender) : ControllerBase
 {
+    /// <summary>Opens an account for the caller. A retry with the same key gets the same account, not a second one.</summary>
     [HttpPost]
     [Authorize(Roles = IdentityRoles.Customer)]
+    [Idempotent]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> Open(OpenAccountRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);

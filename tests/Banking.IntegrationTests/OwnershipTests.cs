@@ -127,7 +127,8 @@ public sealed class OwnershipTests(BankingApiFactory api) : IClassFixture<Bankin
     {
         var (userId, ayse) = await api.CreateOtherCustomerAsync();
 
-        using var response = await _ahmet.Http.PostAsJsonAsync("/accounts", new { currency = "TRY", ownerId = userId }, Cancellation);
+        using var response = await BankingClient.PostAsync(
+            _ahmet.Http, "/accounts", new { currency = "TRY", ownerId = userId }, BankingClient.NewKey());
 
         var account = (await response.Content.ReadFromJsonAsync<AccountDto>(Cancellation))!;
         (await _ahmet.GetAccountAsync(account.Id)).Id.ShouldBe(account.Id);

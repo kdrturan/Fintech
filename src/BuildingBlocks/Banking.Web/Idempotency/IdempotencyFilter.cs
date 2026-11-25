@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Banking.Web.Authentication;
 using Banking.Web.Errors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,8 @@ namespace Banking.Web.Idempotency;
 /// <summary>
 /// Makes a POST endpoint safe to retry, following Stripe and draft-ietf-httpapi-idempotency-key-header:
 /// the first response for a key (success or error) is stored and returned again for every retry with that key.
-/// A resource filter runs before model binding, so a replay never reaches the controller. See docs/adr/0012.
+/// Keys belong to the user who sent them, so nobody can replay or block another user's request.
+/// A resource filter runs after authorization and before model binding, so a replay never reaches the controller. See docs/adr/0012.
 /// </summary>
 internal sealed class IdempotencyFilter(IdempotencyStore store, IOptions<JsonOptions> jsonOptions) : IAsyncResourceFilter
 {
@@ -40,9 +42,11 @@ internal sealed class IdempotencyFilter(IdempotencyStore store, IOptions<JsonOpt
             return;
         }
 
+        // From the token, never from the request: a user could otherwise ask for someone else's stored response.
+        var userId = httpContext.User.GetUserId();
         var cancellationToken = httpContext.RequestAborted;
         var fingerprint = await FingerprintAsync(httpContext.Request, cancellationToken);
-        var existing = await store.TryClaimAsync(key, fingerprint, cancellationToken);
+        var existing = await store.TryClaimAsync(userId, key, fingerprint, cancellationToken);
 
         if (existing is not null)
         {
@@ -56,21 +60,21 @@ internal sealed class IdempotencyFilter(IdempotencyStore store, IOptions<JsonOpt
         {
             // The handler may have moved money before it failed, so a retry must not run it again: the failure is
             // stored and replayed like any other outcome, and the recovery job finishes the transfer. See docs/adr/0012.
-            await store.CompleteAsync(key, StatusCodes.Status500InternalServerError, contentType: null, body: null, CancellationToken.None);
+            await store.CompleteAsync(userId, key, StatusCodes.Status500InternalServerError, contentType: null, body: null, CancellationToken.None);
             return;
         }
 
         if (executed.Result is not IStatusCodeActionResult result)
         {
             // Nothing says what happened: give the key back so the client can retry it.
-            await store.ReleaseAsync(key);
+            await store.ReleaseAsync(userId, key);
             return;
         }
 
         var statusCode = result.StatusCode ?? StatusCodes.Status200OK;
 
         var (contentType, body) = Serialize(executed.Result);
-        await store.CompleteAsync(key, statusCode, contentType, body, CancellationToken.None);
+        await store.CompleteAsync(userId, key, statusCode, contentType, body, CancellationToken.None);
     }
 
     private static IActionResult Replay(IdempotentRequest existing, string fingerprint, HttpContext httpContext)

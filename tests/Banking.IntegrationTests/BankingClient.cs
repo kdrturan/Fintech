@@ -16,7 +16,7 @@ public sealed record MeDto(Guid Id, string Email, string[] Roles);
 
 /// <summary>
 /// Calls the API the way a client would: a customer for everything except paying cash in, which only a teller can do.
-/// Every money-moving call sends a fresh Idempotency-Key unless one is given.
+/// Every call that creates something or moves money sends a fresh Idempotency-Key unless one is given.
 /// </summary>
 public sealed class BankingClient(HttpClient http, HttpClient teller)
 {
@@ -28,7 +28,7 @@ public sealed class BankingClient(HttpClient http, HttpClient teller)
 
     public async Task<AccountDto> OpenAccountAsync(string currency = "TRY")
     {
-        using var response = await http.PostAsJsonAsync("/accounts", new { currency }, Cancellation);
+        using var response = await PostAccountAsync(currency);
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
         return (await response.Content.ReadFromJsonAsync<AccountDto>(Cancellation))!;
     }
@@ -40,6 +40,9 @@ public sealed class BankingClient(HttpClient http, HttpClient teller)
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         return account;
     }
+
+    public Task<HttpResponseMessage> PostAccountAsync(string currency = "TRY", string? idempotencyKey = null) =>
+        PostAsync(http, "/accounts", new { currency }, idempotencyKey ?? NewKey());
 
     public async Task<AccountDto> GetAccountAsync(Guid id) =>
         (await http.GetFromJsonAsync<AccountDto>($"/accounts/{id}", Cancellation))!;
@@ -66,7 +69,7 @@ public sealed class BankingClient(HttpClient http, HttpClient teller)
     public static async Task<string?> ErrorCodeAsync(HttpResponseMessage response) =>
         (await ProblemAsync(response)).GetProperty("errorCode").GetString();
 
-    private static async Task<HttpResponseMessage> PostAsync(HttpClient client, string path, object body, string idempotencyKey)
+    public static async Task<HttpResponseMessage> PostAsync(HttpClient client, string path, object body, string idempotencyKey)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, path) { Content = JsonContent.Create(body) };
         request.Headers.Add("Idempotency-Key", idempotencyKey);

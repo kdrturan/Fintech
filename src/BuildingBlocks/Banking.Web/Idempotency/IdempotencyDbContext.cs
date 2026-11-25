@@ -17,7 +17,7 @@ public sealed class IdempotencyDbContext(DbContextOptions<IdempotencyDbContext> 
         modelBuilder.Entity<IdempotentRequest>(request =>
         {
             request.ToTable("requests");
-            request.HasKey(row => row.Key);
+            request.HasKey(row => new { row.UserId, row.Key });
             request.Property(row => row.Key).HasMaxLength(IdempotencyFilter.MaxKeyLength);
             request.Property(row => row.Fingerprint).HasMaxLength(64).IsFixedLength();
             request.Property(row => row.CreatedAt).HasDefaultValueSql("now()");

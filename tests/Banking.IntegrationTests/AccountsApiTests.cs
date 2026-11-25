@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using Banking.Modules.Ledger.Domain;
 using Banking.SharedKernel;
 
@@ -22,7 +21,7 @@ public sealed class AccountsApiTests(BankingApiFactory api) : IClassFixture<Bank
     [Fact]
     public async Task An_unknown_currency_is_a_validation_error()
     {
-        using var response = await _client.Http.PostAsJsonAsync("/accounts", new { currency = "XYZ" }, TestContext.Current.CancellationToken);
+        using var response = await _client.PostAccountAsync("XYZ");
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         (await BankingClient.ErrorCodeAsync(response)).ShouldBe("money.unknown_currency");

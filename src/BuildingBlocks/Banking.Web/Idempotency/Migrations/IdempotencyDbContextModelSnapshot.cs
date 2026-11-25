@@ -25,6 +25,10 @@ namespace Banking.Web.Idempotency.Migrations
 
             modelBuilder.Entity("Banking.Web.Idempotency.IdempotentRequest", b =>
                 {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
                     b.Property<string>("Key")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -60,7 +64,7 @@ namespace Banking.Web.Idempotency.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("status_code");
 
-                    b.HasKey("Key")
+                    b.HasKey("UserId", "Key")
                         .HasName("pk_requests");
 
                     b.ToTable("requests", "idempotency");

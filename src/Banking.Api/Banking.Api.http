@@ -39,10 +39,12 @@ Content-Type: application/json
 ### Without a token: 401
 GET {{host}}/me
 
-### Open an account (copy the "id" from the response into @ahmet / @ayse below)
+### Open an account (copy the "id" from the response into @ahmet / @ayse below).
+### Send it twice: the same account comes back. Change the key for a second account.
 POST {{host}}/accounts
 Authorization: Bearer {{token}}
 Content-Type: application/json
+Idempotency-Key: account-1
 
 { "currency": "TRY" }
 
