@@ -8,10 +8,11 @@ public interface ILedgerApi
 {
     /// <summary>
     /// Moves money from one customer account to another. Posting the same <paramref name="idempotencyKey"/> again
-    /// returns the original result instead of moving the money twice.
+    /// returns the original result instead of moving the money twice. The source must belong to <paramref name="requestedBy"/>.
     /// </summary>
     Task<LedgerPostResult> TransferAsync(
         Guid idempotencyKey,
+        Guid requestedBy,
         Guid sourceAccountId,
         Guid destinationAccountId,
         decimal amount,

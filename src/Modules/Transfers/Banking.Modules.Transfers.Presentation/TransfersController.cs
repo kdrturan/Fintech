@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Banking.Modules.Transfers.Application;
 using Banking.SharedKernel;
+using Banking.Web.Authentication;
 using Banking.Web.Errors;
 using Banking.Web.Idempotency;
 using MediatR;
@@ -28,6 +29,7 @@ public sealed class TransfersController(ISender sender) : ControllerBase
         ArgumentNullException.ThrowIfNull(request);
 
         var command = new CreateTransferCommand(
+            User.GetUserId(),
             request.SourceAccountId!.Value,
             request.DestinationAccountId!.Value,
             request.Amount!.Value,
@@ -55,7 +57,7 @@ public sealed class TransfersController(ISender sender) : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new GetTransferQuery(id), cancellationToken);
+        var result = await sender.Send(new GetTransferQuery(User.GetUserId(), id), cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : this.Problem(result.Error!);
     }
 }

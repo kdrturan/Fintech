@@ -8,11 +8,37 @@ public sealed class AccountTests
     [Fact]
     public void A_customer_account_is_a_liability_that_cannot_go_negative()
     {
-        var account = Account.OpenCustomerAccount(Currency.TRY);
+        var account = Account.OpenCustomerAccount(Guid.CreateVersion7(), Currency.TRY);
 
         account.Type.ShouldBe(AccountType.Liability);
         account.AllowsNegativeBalance.ShouldBeFalse();
         account.Balance.ShouldBe(Money.Zero(Currency.TRY));
+    }
+
+    [Fact]
+    public void A_customer_account_is_owned_by_its_customer_and_nobody_else()
+    {
+        var owner = Guid.CreateVersion7();
+        var account = Account.OpenCustomerAccount(owner, Currency.TRY);
+
+        account.IsOwnedBy(owner).ShouldBeTrue();
+        account.IsOwnedBy(Guid.CreateVersion7()).ShouldBeFalse();
+        account.IsOwnedBy(Guid.Empty).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Nobody_owns_the_banks_own_accounts()
+    {
+        var account = Account.OpenInternalAccount(AccountType.Asset, Currency.TRY);
+
+        account.OwnerId.ShouldBeNull();
+        account.IsOwnedBy(Guid.Empty).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void A_customer_account_without_an_owner_is_a_bug()
+    {
+        Should.Throw<ArgumentException>(() => Account.OpenCustomerAccount(Guid.Empty, Currency.TRY));
     }
 
     [Theory]

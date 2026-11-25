@@ -44,6 +44,15 @@ public sealed class BankingApiFactory(PostgresFixture postgres) : WebApplication
     /// <summary>The class's customer, with a teller at hand for paying cash in.</summary>
     public BankingClient CreateBankingClient() => new(CreateClient(), CreateTellerClient());
 
+    /// <summary>Another customer, for testing that one customer cannot reach what belongs to another.</summary>
+    public async Task<(Guid UserId, BankingClient Client)> CreateOtherCustomerAsync()
+    {
+        var (userId, accessToken) = await RegisterAndSignInAsync(NewEmail());
+        var client = CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        return (userId, new BankingClient(client, CreateTellerClient()));
+    }
+
     /// <summary>A client signed in as the teller that the API created from its configuration when it started.</summary>
     public HttpClient CreateTellerClient()
     {

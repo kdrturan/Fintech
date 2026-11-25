@@ -83,13 +83,14 @@ public sealed class CrashAfterPostingTests(BankingApiFactory api) : IClassFixtur
     {
         public async Task<LedgerPostResult> TransferAsync(
             Guid idempotencyKey,
+            Guid requestedBy,
             Guid sourceAccountId,
             Guid destinationAccountId,
             decimal amount,
             string currency,
             CancellationToken cancellationToken)
         {
-            var result = await inner.TransferAsync(idempotencyKey, sourceAccountId, destinationAccountId, amount, currency, cancellationToken);
+            var result = await inner.TransferAsync(idempotencyKey, requestedBy, sourceAccountId, destinationAccountId, amount, currency, cancellationToken);
             return result.Succeeded ? throw new InvalidOperationException("Simulated crash after the Ledger posted.") : result;
         }
     }

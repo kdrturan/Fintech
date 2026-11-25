@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Banking.Modules.Transfers.Application;
 
-public sealed record GetTransferQuery(Guid TransferId) : IRequest<Result<TransferResponse>>;
+public sealed record GetTransferQuery(Guid UserId, Guid TransferId) : IRequest<Result<TransferResponse>>;
 
 public sealed class GetTransferHandler(ITransferRepository transfers) : IRequestHandler<GetTransferQuery, Result<TransferResponse>>
 {
@@ -16,6 +16,9 @@ public sealed class GetTransferHandler(ITransferRepository transfers) : IRequest
         var id = new TransferId(request.TransferId);
         var transfer = await transfers.FindAsync(id, cancellationToken);
 
-        return transfer is null ? TransferErrors.NotFound(id) : TransferResponse.From(transfer);
+        // Someone else's transfer gets the same answer as one that does not exist.
+        return transfer is null || transfer.RequestedBy != request.UserId
+            ? TransferErrors.NotFound(id)
+            : TransferResponse.From(transfer);
     }
 }

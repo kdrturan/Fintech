@@ -45,6 +45,10 @@ namespace Banking.Modules.Transfers.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("failure_reason");
 
+                    b.Property<Guid>("RequestedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("requested_by");
+
                     b.Property<Guid>("SourceAccountId")
                         .HasColumnType("uuid")
                         .HasColumnName("source_account_id");

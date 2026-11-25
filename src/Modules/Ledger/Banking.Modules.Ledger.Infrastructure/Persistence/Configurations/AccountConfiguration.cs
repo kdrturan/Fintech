@@ -17,6 +17,10 @@ internal sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasConversion(id => id.Value, value => new AccountId(value))
             .ValueGeneratedNever();
 
+        // A plain id: users belong to the Identity module, so there is no foreign key across schemas.
+        builder.Property(account => account.OwnerId);
+        builder.HasIndex(account => account.OwnerId);
+
         builder.Property(account => account.Type).HasConversion<string>().HasMaxLength(16);
         builder.Property(account => account.Currency).HasCurrencyConversion();
         builder.Property(account => account.AllowsNegativeBalance);

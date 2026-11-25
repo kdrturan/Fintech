@@ -41,6 +41,10 @@ namespace Banking.Modules.Ledger.Infrastructure.Persistence.Migrations
                         .HasColumnName("currency")
                         .IsFixedLength();
 
+                    b.Property<Guid?>("OwnerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owner_id");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(16)
@@ -66,6 +70,9 @@ namespace Banking.Modules.Ledger.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_accounts");
+
+                    b.HasIndex("OwnerId")
+                        .HasDatabaseName("ix_accounts_owner_id");
 
                     b.ToTable("accounts", "ledger", t =>
                         {

@@ -20,7 +20,8 @@ internal sealed class TransferConfiguration : IEntityTypeConfiguration<Transfer>
             .HasConversion(id => id.Value, value => new TransferId(value))
             .ValueGeneratedNever();
 
-        // Plain ids: the accounts belong to the Ledger, so there is no foreign key across schemas.
+        // Plain ids: users belong to Identity and accounts to the Ledger, so there is no foreign key across schemas.
+        builder.Property(transfer => transfer.RequestedBy);
         builder.Property(transfer => transfer.SourceAccountId);
         builder.Property(transfer => transfer.DestinationAccountId);
 

@@ -43,7 +43,7 @@ public sealed class TransferRecoveryTests(BankingApiFactory api) : IClassFixture
         await using (var scope = api.Services.CreateAsyncScope())
         {
             var ledger = scope.ServiceProvider.GetRequiredService<ILedgerApi>();
-            (await ledger.TransferAsync(transfer.Id.Value, ahmet.Id, ayse.Id, 30m, "TRY", TestContext.Current.CancellationToken))
+            (await ledger.TransferAsync(transfer.Id.Value, api.CustomerId, ahmet.Id, ayse.Id, 30m, "TRY", TestContext.Current.CancellationToken))
                 .Succeeded.ShouldBeTrue();
         }
 
@@ -107,7 +107,7 @@ public sealed class TransferRecoveryTests(BankingApiFactory api) : IClassFixture
         await using var scope = api.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<TransfersDbContext>();
 
-        var transfer = Transfer.Create(from, to, Money.Of(amount, Currency.TRY)).Value;
+        var transfer = Transfer.Create(api.CustomerId, from, to, Money.Of(amount, Currency.TRY)).Value;
         if (failWith is not null)
         {
             transfer.Fail(failWith);

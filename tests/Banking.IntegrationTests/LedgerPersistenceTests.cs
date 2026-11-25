@@ -12,7 +12,7 @@ public sealed class LedgerPersistenceTests(BankingApiFactory api) : IClassFixtur
     public async Task An_account_survives_a_round_trip()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
-        var account = Account.OpenCustomerAccount(Currency.TRY);
+        var account = Account.OpenCustomerAccount(LedgerTestData.Owner, Currency.TRY);
 
         await using (var scope = api.Services.CreateAsyncScope())
         {
@@ -26,6 +26,7 @@ public sealed class LedgerPersistenceTests(BankingApiFactory api) : IClassFixtur
             var db = scope.ServiceProvider.GetRequiredService<LedgerDbContext>();
             var loaded = await db.Accounts.FirstOrDefaultAsync(a => a.Id == account.Id, cancellationToken);
             loaded.ShouldNotBeNull();
+            loaded.OwnerId.ShouldBe(LedgerTestData.Owner);
             loaded.Type.ShouldBe(account.Type);
             loaded.Currency.ShouldBe(account.Currency);
             loaded.AllowsNegativeBalance.ShouldBeFalse();
@@ -37,7 +38,7 @@ public sealed class LedgerPersistenceTests(BankingApiFactory api) : IClassFixtur
     public async Task A_journal_entry_survives_a_round_trip_with_its_postings()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
-        var customer = Account.OpenCustomerAccount(Currency.TRY);
+        var customer = Account.OpenCustomerAccount(LedgerTestData.Owner, Currency.TRY);
         var amount = Money.Of(100m, Currency.TRY);
 
         // A cash deposit: the bank's cash (seeded by the migration) is debited, the customer is credited.

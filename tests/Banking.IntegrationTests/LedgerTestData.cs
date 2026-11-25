@@ -12,12 +12,15 @@ namespace Banking.IntegrationTests;
 /// </summary>
 internal static class LedgerTestData
 {
+    /// <summary>The owner of every account opened here, and so the one who requests every transfer.</summary>
+    public static readonly Guid Owner = Guid.CreateVersion7();
+
     private static CancellationToken Cancellation => TestContext.Current.CancellationToken;
 
     /// <summary>Opens a TRY customer account and pays in <paramref name="balance"/> from the bank's cash.</summary>
     public static async Task<Guid> OpenAccountWithAsync(this BankingApiFactory api, decimal balance)
     {
-        var account = Account.OpenCustomerAccount(Currency.TRY);
+        var account = Account.OpenCustomerAccount(Owner, Currency.TRY);
 
         await using var scope = api.Services.CreateAsyncScope();
         await scope.ServiceProvider.GetRequiredService<IAccountRepository>().AddAsync(account, Cancellation);
@@ -51,6 +54,6 @@ internal static class LedgerTestData
     {
         await using var scope = api.Services.CreateAsyncScope();
         var ledger = scope.ServiceProvider.GetRequiredService<ILedgerApi>();
-        return await ledger.TransferAsync(idempotencyKey, from, to, amount, Currency.TRY.Code, Cancellation);
+        return await ledger.TransferAsync(idempotencyKey, Owner, from, to, amount, Currency.TRY.Code, Cancellation);
     }
 }

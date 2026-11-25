@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Banking.Modules.Ledger.Application.Accounts;
 
-public sealed record OpenAccountCommand(string Currency) : IRequest<Result<AccountResponse>>;
+public sealed record OpenAccountCommand(Guid OwnerId, string Currency) : IRequest<Result<AccountResponse>>;
 
 public sealed class OpenAccountHandler(IAccountRepository accounts) : IRequestHandler<OpenAccountCommand, Result<AccountResponse>>
 {
@@ -18,7 +18,7 @@ public sealed class OpenAccountHandler(IAccountRepository accounts) : IRequestHa
             return MoneyErrors.UnknownCurrency(request.Currency);
         }
 
-        var account = Account.OpenCustomerAccount(currency);
+        var account = Account.OpenCustomerAccount(request.OwnerId, currency);
         await accounts.AddAsync(account, cancellationToken);
 
         return AccountResponse.From(account);

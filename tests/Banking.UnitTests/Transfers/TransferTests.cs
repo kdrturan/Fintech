@@ -6,6 +6,8 @@ namespace Banking.UnitTests.Transfers;
 
 public sealed class TransferTests
 {
+    private static readonly Guid Requester = Guid.CreateVersion7();
+
     private static readonly Guid Ahmet = Guid.CreateVersion7();
     private static readonly Guid Ayse = Guid.CreateVersion7();
 
@@ -23,7 +25,7 @@ public sealed class TransferTests
     [InlineData(-30)]
     public void The_amount_must_be_positive(int amount)
     {
-        var result = Transfer.Create(Ahmet, Ayse, Money.Of(amount, Currency.TRY));
+        var result = Transfer.Create(Requester, Ahmet, Ayse, Money.Of(amount, Currency.TRY));
 
         result.Error.ShouldBe(TransferErrors.AmountMustBePositive);
     }
@@ -31,7 +33,7 @@ public sealed class TransferTests
     [Fact]
     public void Source_and_destination_must_differ()
     {
-        var result = Transfer.Create(Ahmet, Ahmet, Money.Of(30m, Currency.TRY));
+        var result = Transfer.Create(Requester, Ahmet, Ahmet, Money.Of(30m, Currency.TRY));
 
         result.Error.ShouldBe(TransferErrors.SameAccount);
     }
@@ -91,9 +93,21 @@ public sealed class TransferTests
     public void The_amount_must_be_greater_than_zero(string amount, bool succeeds)
     {
         var decimalAmount = decimal.Parse(amount, CultureInfo.InvariantCulture);
-        var result = Transfer.Create(Ahmet, Ayse, Money.Of(decimalAmount, Currency.TRY));
+        var result = Transfer.Create(Requester, Ahmet, Ayse, Money.Of(decimalAmount, Currency.TRY));
         result.IsSuccess.ShouldBe(succeeds);
     }
 
-    private static Transfer PendingTransfer() => Transfer.Create(Ahmet, Ayse, Money.Of(30m, Currency.TRY)).Value;
+    [Fact]
+    public void A_transfer_remembers_who_requested_it()
+    {
+        PendingTransfer().RequestedBy.ShouldBe(Requester);
+    }
+
+    [Fact]
+    public void A_transfer_that_nobody_requested_is_a_bug()
+    {
+        Should.Throw<ArgumentException>(() => Transfer.Create(Guid.Empty, Ahmet, Ayse, Money.Of(30m, Currency.TRY)));
+    }
+
+    private static Transfer PendingTransfer() => Transfer.Create(Requester, Ahmet, Ayse, Money.Of(30m, Currency.TRY)).Value;
 }

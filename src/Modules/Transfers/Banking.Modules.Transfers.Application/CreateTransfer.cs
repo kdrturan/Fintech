@@ -10,7 +10,12 @@ namespace Banking.Modules.Transfers.Application;
 /// Moves money between two customer accounts, synchronously: the response carries the final status.
 /// A request that fails the transfer's own rules creates nothing; a transfer the Ledger rejects is kept as Failed.
 /// </summary>
-public sealed record CreateTransferCommand(Guid SourceAccountId, Guid DestinationAccountId, decimal Amount, string Currency)
+public sealed record CreateTransferCommand(
+    Guid RequestedBy,
+    Guid SourceAccountId,
+    Guid DestinationAccountId,
+    decimal Amount,
+    string Currency)
     : IRequest<Result<TransferResponse>>;
 
 public sealed class CreateTransferHandler(ITransferRepository transfers, ILedgerApi ledger)
@@ -26,7 +31,7 @@ public sealed class CreateTransferHandler(ITransferRepository transfers, ILedger
             return amount.Error!;
         }
 
-        var created = Transfer.Create(request.SourceAccountId, request.DestinationAccountId, amount.Value);
+        var created = Transfer.Create(request.RequestedBy, request.SourceAccountId, request.DestinationAccountId, amount.Value);
         if (created.IsFailure)
         {
             return created.Error!;

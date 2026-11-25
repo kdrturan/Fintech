@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Banking.Modules.Ledger.Application.Accounts;
 
-public sealed record GetAccountQuery(Guid AccountId) : IRequest<Result<AccountResponse>>;
+public sealed record GetAccountQuery(Guid UserId, Guid AccountId) : IRequest<Result<AccountResponse>>;
 
 public sealed class GetAccountHandler(IAccountRepository accounts) : IRequestHandler<GetAccountQuery, Result<AccountResponse>>
 {
@@ -16,8 +16,9 @@ public sealed class GetAccountHandler(IAccountRepository accounts) : IRequestHan
         var id = new AccountId(request.AccountId);
         var account = await accounts.FindAsync(id, cancellationToken);
 
-        // The bank's own accounts are not visible through the API: for a caller they do not exist.
-        if (account is null || !account.IsCustomerAccount)
+        // Someone else's account gets the same answer as one that does not exist. A 403 would confirm that it does.
+        // The bank's own accounts have no owner, so nobody sees them.
+        if (account is null || !account.IsOwnedBy(request.UserId))
         {
             return LedgerErrors.AccountNotFound(id);
         }

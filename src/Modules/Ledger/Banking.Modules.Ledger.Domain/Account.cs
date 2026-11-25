@@ -8,9 +8,10 @@ namespace Banking.Modules.Ledger.Domain;
 /// </summary>
 public sealed class Account
 {
-    private Account(AccountId id, AccountType type, Currency currency, bool allowsNegativeBalance)
+    private Account(AccountId id, Guid? ownerId, AccountType type, Currency currency, bool allowsNegativeBalance)
     {
         Id = id;
+        OwnerId = ownerId;
         Type = type;
         Currency = currency;
         AllowsNegativeBalance = allowsNegativeBalance;
@@ -18,6 +19,12 @@ public sealed class Account
     }
 
     public AccountId Id { get; }
+
+    /// <summary>
+    /// The user a customer account belongs to; null for the bank's own accounts. Users belong to the Identity module,
+    /// so the Ledger stores the plain id and never asks who it is.
+    /// </summary>
+    public Guid? OwnerId { get; }
 
     public AccountType Type { get; }
 
@@ -35,12 +42,22 @@ public sealed class Account
     public bool IsCustomerAccount => Type == AccountType.Liability && !AllowsNegativeBalance;
 
     /// <summary>A customer's deposit account. From the bank's point of view it is a liability.</summary>
-    public static Account OpenCustomerAccount(Currency currency) =>
-        new(AccountId.New(), AccountType.Liability, currency, allowsNegativeBalance: false);
+    public static Account OpenCustomerAccount(Guid ownerId, Currency currency)
+    {
+        if (ownerId == Guid.Empty)
+        {
+            throw new ArgumentException("A customer account needs an owner.", nameof(ownerId));
+        }
+
+        return new Account(AccountId.New(), ownerId, AccountType.Liability, currency, allowsNegativeBalance: false);
+    }
 
     /// <summary>One of the bank's own accounts, such as cash, clearing or fee income.</summary>
     public static Account OpenInternalAccount(AccountType type, Currency currency) =>
-        new(AccountId.New(), type, currency, allowsNegativeBalance: true);
+        new(AccountId.New(), ownerId: null, type, currency, allowsNegativeBalance: true);
+
+    /// <summary>Nobody owns the bank's own accounts, so this is never true for them.</summary>
+    public bool IsOwnedBy(Guid userId) => OwnerId == userId;
 
     /// <summary>How a posting changes this account's balance: +amount on its increasing side, -amount on the other.</summary>
     public Money EffectOf(Direction direction, Money amount)

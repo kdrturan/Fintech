@@ -96,10 +96,10 @@ The API listens on `http://localhost:5104`. Liveness check: `GET /health`. The O
 | Endpoint | Does | Idempotency-Key |
 |---|---|---|
 | `POST /accounts` | Opens an account in a currency (customers) | |
-| `GET /accounts/{id}` | Returns the account and its balance | |
+| `GET /accounts/{id}` | Returns the account and its balance (its owner) | |
 | `POST /accounts/{id}/deposits` | Pays cash in (tellers only) | required |
-| `POST /transfers` | Moves money between two customer accounts; 201 `Completed` or 422 with `transferId` | required |
-| `GET /transfers/{id}` | Returns a transfer's status and failure reason | |
+| `POST /transfers` | Moves money from the caller's own account; 201 `Completed` or 422 with `transferId` | required |
+| `GET /transfers/{id}` | Returns a transfer's status and failure reason (who requested it) | |
 
 Errors are RFC 9457 problem details with a stable `errorCode` ([ADR 0013](docs/adr/0013-http-api-layer.md)).
 

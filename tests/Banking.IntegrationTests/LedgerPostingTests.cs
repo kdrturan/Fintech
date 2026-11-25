@@ -76,7 +76,7 @@ public sealed class LedgerPostingTests(BankingApiFactory api) : IClassFixture<Ba
         var results = new List<LedgerPostResult>();
         for (var i = 0; i < 3; i++)
         {
-            results.Add(await ledger.TransferAsync(Guid.CreateVersion7(), ahmet, ayse, 10m, Currency.TRY.Code, TestContext.Current.CancellationToken));
+            results.Add(await ledger.TransferAsync(Guid.CreateVersion7(), LedgerTestData.Owner, ahmet, ayse, 10m, Currency.TRY.Code, TestContext.Current.CancellationToken));
         }
 
         results.ShouldAllBe(result => result.Succeeded);

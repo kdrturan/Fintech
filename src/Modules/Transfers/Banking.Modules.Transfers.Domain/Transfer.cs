@@ -8,9 +8,10 @@ namespace Banking.Modules.Transfers.Domain;
 /// </summary>
 public sealed class Transfer
 {
-    private Transfer(TransferId id, Guid sourceAccountId, Guid destinationAccountId, Money amount)
+    private Transfer(TransferId id, Guid requestedBy, Guid sourceAccountId, Guid destinationAccountId, Money amount)
     {
         Id = id;
+        RequestedBy = requestedBy;
         SourceAccountId = sourceAccountId;
         DestinationAccountId = destinationAccountId;
         Amount = amount;
@@ -29,6 +30,12 @@ public sealed class Transfer
     public TransferId Id { get; }
 
     /// <summary>
+    /// The user who asked for the transfer. Kept because the recovery job posts it later, when there is no request and
+    /// no token to take the user from, and the Ledger must still check that the source account is theirs.
+    /// </summary>
+    public Guid RequestedBy { get; }
+
+    /// <summary>
     /// Accounts belong to the Ledger module. Transfers may not reference Ledger.Domain,
     /// so it stores the plain id, the same primitive Ledger.Contracts will expose.
     /// </summary>
@@ -42,9 +49,14 @@ public sealed class Transfer
 
     public string? FailureReason { get; private set; }
 
-    public static Result<Transfer> Create(Guid sourceAccountId, Guid destinationAccountId, Money amount)
+    public static Result<Transfer> Create(Guid requestedBy, Guid sourceAccountId, Guid destinationAccountId, Money amount)
     {
         ArgumentNullException.ThrowIfNull(amount);
+
+        if (requestedBy == Guid.Empty)
+        {
+            throw new ArgumentException("A transfer needs the user who requested it.", nameof(requestedBy));
+        }
 
         if (!amount.IsPositive)
         {
@@ -56,7 +68,7 @@ public sealed class Transfer
             return TransferErrors.SameAccount;
         }
 
-        return new Transfer(TransferId.New(), sourceAccountId, destinationAccountId, amount);
+        return new Transfer(TransferId.New(), requestedBy, sourceAccountId, destinationAccountId, amount);
     }
 
     /// <summary>

@@ -7,8 +7,8 @@ public sealed class PostingEngineTests
 {
     private readonly Account _cash = Account.OpenInternalAccount(AccountType.Asset, Currency.TRY);
     private readonly Account _feeIncome = Account.OpenInternalAccount(AccountType.Income, Currency.TRY);
-    private readonly Account _ahmet = Account.OpenCustomerAccount(Currency.TRY);
-    private readonly Account _ayse = Account.OpenCustomerAccount(Currency.TRY);
+    private readonly Account _ahmet = Account.OpenCustomerAccount(Guid.CreateVersion7(), Currency.TRY);
+    private readonly Account _ayse = Account.OpenCustomerAccount(Guid.CreateVersion7(), Currency.TRY);
 
     [Fact]
     public void A_cash_deposit_increases_both_the_bank_cash_and_the_customer_balance()
@@ -63,7 +63,7 @@ public sealed class PostingEngineTests
     [Fact]
     public void Posting_to_an_account_in_another_currency_fails()
     {
-        var dollarAccount = Account.OpenCustomerAccount(Currency.USD);
+        var dollarAccount = Account.OpenCustomerAccount(Guid.CreateVersion7(), Currency.USD);
         var entry = JournalEntry.Create(Guid.CreateVersion7(), [Debit(_cash, 10m), Credit(dollarAccount, 10m)]);
 
         var result = PostingEngine.Post(entry, Accounts(_cash, dollarAccount));

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Banking.Modules.Identity.Contracts;
 using Banking.Modules.Ledger.Application.Accounts;
+using Banking.Web.Authentication;
 using Banking.Web.Errors;
 using Banking.Web.Idempotency;
 using MediatR;
@@ -23,7 +24,7 @@ public sealed class AccountsController(ISender sender) : ControllerBase
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var result = await sender.Send(new OpenAccountCommand(request.Currency), cancellationToken);
+        var result = await sender.Send(new OpenAccountCommand(User.GetUserId(), request.Currency), cancellationToken);
         return result.IsSuccess
             ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
             : this.Problem(result.Error!);
@@ -34,7 +35,7 @@ public sealed class AccountsController(ISender sender) : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new GetAccountQuery(id), cancellationToken);
+        var result = await sender.Send(new GetAccountQuery(User.GetUserId(), id), cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : this.Problem(result.Error!);
     }
 

@@ -17,7 +17,7 @@ public sealed class TransferVersionTests(BankingApiFactory api) : IClassFixture<
         var cancellation = TestContext.Current.CancellationToken;
 
         // Plain ids: the transfers table has no foreign key to the Ledger's accounts, and nothing here calls the Ledger.
-        var transfer = Transfer.Create(Guid.NewGuid(), Guid.NewGuid(), Money.TryCreate(10m, "TRY").Value).Value;
+        var transfer = Transfer.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Money.TryCreate(10m, "TRY").Value).Value;
 
         // Scope 1, the request: records the intent. Its DbContext now holds this transfer, with the xmin it saw.
         await using var first = api.Services.CreateAsyncScope();
