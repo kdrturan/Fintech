@@ -20,13 +20,13 @@ public sealed class CrashAfterPostingTests(BankingApiFactory api) : IClassFixtur
     public async Task A_retry_after_a_crash_moves_no_money_and_recovery_finishes_the_transfer()
     {
         var cancellation = TestContext.Current.CancellationToken;
-        var client = new BankingClient(api.CreateClient());
+        var client = api.CreateBankingClient();
         var ahmet = await client.OpenAccountWithAsync(100m);
         var ayse = await client.OpenAccountAsync();
 
         // The same API and database, except that the Ledger "crashes" right after it moved the money.
         await using var crashing = api.WithWebHostBuilder(builder => builder.ConfigureTestServices(CrashAfterPosting));
-        var crashingClient = new BankingClient(crashing.CreateClient());
+        var crashingClient = new BankingClient(crashing.CreateClient(), client.Teller);
         var key = BankingClient.NewKey();
 
         using var first = await crashingClient.TransferAsync(ahmet.Id, ayse.Id, 30m, idempotencyKey: key);

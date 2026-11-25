@@ -16,7 +16,7 @@ public sealed class TransferRecoveryTests(BankingApiFactory api) : IClassFixture
 {
     private static readonly TimeSpan LongAgo = TimeSpan.FromHours(1);
 
-    private readonly BankingClient _client = new(api.CreateClient());
+    private readonly BankingClient _client = api.CreateBankingClient();
 
     [Fact]
     public async Task A_transfer_stuck_before_posting_is_completed_and_the_money_moves()

@@ -6,7 +6,7 @@ namespace Banking.IntegrationTests;
 /// <summary>The HTTP side of idempotency (docs/adr/0012): what a client sees when it retries a request.</summary>
 public sealed class IdempotencyKeyTests(BankingApiFactory api) : IClassFixture<BankingApiFactory>
 {
-    private readonly BankingClient _client = new(api.CreateClient());
+    private readonly BankingClient _client = api.CreateBankingClient();
 
     [Fact]
     public async Task A_retry_with_the_same_key_returns_the_first_response_and_moves_the_money_once()
@@ -66,7 +66,7 @@ public sealed class IdempotencyKeyTests(BankingApiFactory api) : IClassFixture<B
             Content = System.Net.Http.Json.JsonContent.Create(new { amount = 10m, currency = "TRY" }),
         };
 
-        using var response = await _client.Http.SendAsync(request, TestContext.Current.CancellationToken);
+        using var response = await _client.Teller.SendAsync(request, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         (await BankingClient.ErrorCodeAsync(response)).ShouldBe("idempotency.key_missing");

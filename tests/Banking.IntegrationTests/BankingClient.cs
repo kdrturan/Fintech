@@ -14,12 +14,17 @@ public sealed record LoginDto(string AccessToken, string TokenType, DateTimeOffs
 
 public sealed record MeDto(Guid Id, string Email, string[] Roles);
 
-/// <summary>Calls the API the way a client would. Every money-moving call sends a fresh Idempotency-Key unless one is given.</summary>
-public sealed class BankingClient(HttpClient http)
+/// <summary>
+/// Calls the API the way a client would: a customer for everything except paying cash in, which only a teller can do.
+/// Every money-moving call sends a fresh Idempotency-Key unless one is given.
+/// </summary>
+public sealed class BankingClient(HttpClient http, HttpClient teller)
 {
     private static CancellationToken Cancellation => TestContext.Current.CancellationToken;
 
     public HttpClient Http => http;
+
+    public HttpClient Teller => teller;
 
     public async Task<AccountDto> OpenAccountAsync(string currency = "TRY")
     {
@@ -42,10 +47,10 @@ public sealed class BankingClient(HttpClient http)
     public async Task<decimal> BalanceAsync(Guid id) => (await GetAccountAsync(id)).Balance;
 
     public Task<HttpResponseMessage> DepositAsync(Guid accountId, decimal amount, string currency = "TRY", string? idempotencyKey = null) =>
-        PostAsync($"/accounts/{accountId}/deposits", new { amount, currency }, idempotencyKey ?? NewKey());
+        PostAsync(teller, $"/accounts/{accountId}/deposits", new { amount, currency }, idempotencyKey ?? NewKey());
 
     public Task<HttpResponseMessage> TransferAsync(Guid from, Guid to, decimal amount, string currency = "TRY", string? idempotencyKey = null) =>
-        PostAsync("/transfers", new { sourceAccountId = from, destinationAccountId = to, amount, currency }, idempotencyKey ?? NewKey());
+        PostAsync(http, "/transfers", new { sourceAccountId = from, destinationAccountId = to, amount, currency }, idempotencyKey ?? NewKey());
 
     public async Task<TransferDto> GetTransferAsync(Guid id) =>
         (await http.GetFromJsonAsync<TransferDto>($"/transfers/{id}", Cancellation))!;
@@ -61,10 +66,10 @@ public sealed class BankingClient(HttpClient http)
     public static async Task<string?> ErrorCodeAsync(HttpResponseMessage response) =>
         (await ProblemAsync(response)).GetProperty("errorCode").GetString();
 
-    private async Task<HttpResponseMessage> PostAsync(string path, object body, string idempotencyKey)
+    private static async Task<HttpResponseMessage> PostAsync(HttpClient client, string path, object body, string idempotencyKey)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, path) { Content = JsonContent.Create(body) };
         request.Headers.Add("Idempotency-Key", idempotencyKey);
-        return await http.SendAsync(request, Cancellation);
+        return await client.SendAsync(request, Cancellation);
     }
 }

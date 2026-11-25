@@ -50,9 +50,26 @@ Content-Type: application/json
 @ahmet = 00000000-0000-0000-0000-000000000000
 @ayse = 00000000-0000-0000-0000-000000000000
 
-### Pay in 100 TL. Send it twice with the same key: the balance grows once. Change the key for a new deposit.
+### Sign in as the teller (SeedTeller in user-secrets, see the README), then paste the access token into @teller
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "email": "teller@example.com", "password": "paste-the-teller-password-here" }
+
+###
+@teller = paste-the-teller-access-token-here
+
+### A customer cannot pay in: 403
 POST {{host}}/accounts/{{ahmet}}/deposits
 Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: deposit-forbidden
+
+{ "amount": 100.00, "currency": "TRY" }
+
+### Pay in 100 TL as the teller. Send it twice with the same key: the balance grows once. Change the key for a new deposit.
+POST {{host}}/accounts/{{ahmet}}/deposits
+Authorization: Bearer {{teller}}
 Content-Type: application/json
 Idempotency-Key: deposit-1
 

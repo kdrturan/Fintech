@@ -7,7 +7,7 @@ namespace Banking.IntegrationTests;
 
 public sealed class AccountsApiTests(BankingApiFactory api) : IClassFixture<BankingApiFactory>
 {
-    private readonly BankingClient _client = new(api.CreateClient());
+    private readonly BankingClient _client = api.CreateBankingClient();
 
     [Fact]
     public async Task A_new_account_is_empty_and_can_be_read_back()

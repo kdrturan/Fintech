@@ -5,7 +5,7 @@ namespace Banking.IntegrationTests;
 
 public sealed class TransfersApiTests(BankingApiFactory api) : IClassFixture<BankingApiFactory>
 {
-    private readonly BankingClient _client = new(api.CreateClient());
+    private readonly BankingClient _client = api.CreateBankingClient();
 
     [Fact]
     public async Task A_transfer_moves_money_and_completes()

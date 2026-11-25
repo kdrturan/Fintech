@@ -30,8 +30,10 @@ internal static class DependencyRules
             || (from.IsInSameModuleAs(to) && to.Layer is Layer.Domain or Layer.Application),
 
         // Controllers: HTTP in, MediatR requests of their own module out. Never the database, never the domain.
+        // Contracts for the role names of the Identity module. They are constants, which the compiler copies, so this
+        // dependency does not even show up in the IL that these tests read.
         Layer.Presentation =>
-            to.Layer is Layer.SharedKernel or Layer.Web
+            to.Layer is Layer.SharedKernel or Layer.Web or Layer.Contracts
             || (from.IsInSameModuleAs(to) && to.Layer is Layer.Application),
 
         // Composition root wires modules together through their Infrastructure and Presentation entry points.

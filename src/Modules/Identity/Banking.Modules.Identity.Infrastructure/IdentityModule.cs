@@ -44,6 +44,9 @@ public static class IdentityModule
             .Validate(options => options.Lifetime > TimeSpan.Zero, "RefreshToken:Lifetime must be positive.")
             .ValidateOnStart();
 
+        services.AddOptions<SeedTellerOptions>().Bind(configuration.GetSection(SeedTellerOptions.SectionName));
+        services.AddHostedService<TellerSeeder>();
+
         services.AddSingleton<IAccessTokenIssuer, JwtAccessTokenIssuer>();
         services.AddScoped<IUserAccounts, UserAccounts>();
         services.AddScoped<ISessions, SessionStore>();

@@ -78,12 +78,14 @@ dotnet ef database update --project src/Modules/Ledger/Banking.Modules.Ledger.In
 dotnet ef database update --project src/Modules/Transfers/Banking.Modules.Transfers.Infrastructure --startup-project src/Banking.Api --context TransfersDbContext
 ```
 
-Two secrets never go into the repository: a MediatR license key (free Community license, [ADR 0015](docs/adr/0015-use-mediatr.md)) and the RSA key that signs access tokens. The API refuses to start without the signing key. Generate one in PowerShell and store both with user-secrets:
+Two secrets never go into the repository: a MediatR license key (free Community license, [ADR 0015](docs/adr/0015-use-mediatr.md)) and the RSA key that signs access tokens. The API refuses to start without the signing key. Generate one in PowerShell and store both with user-secrets. `SeedTeller` is optional: the API creates that teller when it starts, and without one nobody can pay cash in.
 
 ```powershell
 $rsa = [System.Security.Cryptography.RSA]::Create(2048)
 dotnet user-secrets set "Jwt:SigningKey" ([Convert]::ToBase64String($rsa.ExportPkcs8PrivateKey())) --project src/Banking.Api
 dotnet user-secrets set "MediatR:LicenseKey" "<your key>" --project src/Banking.Api
+dotnet user-secrets set "SeedTeller:Email" "teller@example.com" --project src/Banking.Api
+dotnet user-secrets set "SeedTeller:Password" "<12+ characters: upper, lower, digit and symbol>" --project src/Banking.Api
 dotnet run --project src/Banking.Api
 ```
 
@@ -93,9 +95,9 @@ The API listens on `http://localhost:5104`. Liveness check: `GET /health`. The O
 
 | Endpoint | Does | Idempotency-Key |
 |---|---|---|
-| `POST /accounts` | Opens an account in a currency | |
+| `POST /accounts` | Opens an account in a currency (customers) | |
 | `GET /accounts/{id}` | Returns the account and its balance | |
-| `POST /accounts/{id}/deposits` | Pays cash in | required |
+| `POST /accounts/{id}/deposits` | Pays cash in (tellers only) | required |
 | `POST /transfers` | Moves money between two customer accounts; 201 `Completed` or 422 with `transferId` | required |
 | `GET /transfers/{id}` | Returns a transfer's status and failure reason | |
 

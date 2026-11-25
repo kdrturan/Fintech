@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../Identity/Banking.Modules.Identity.Contracts/Banking.Modules.Identity.Contracts.csproj" />
     <ProjectReference Include="../Banking.Modules.Ledger.Application/Banking.Modules.Ledger.Application.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Banking.Web/Banking.Web.csproj" />
   </ItemGroup>

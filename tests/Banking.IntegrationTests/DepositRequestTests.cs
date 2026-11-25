@@ -5,7 +5,7 @@ namespace Banking.IntegrationTests;
 
 public sealed class DepositRequestTests(BankingApiFactory api) : IClassFixture<BankingApiFactory>
 {
-    private readonly BankingClient _client = new(api.CreateClient());
+    private readonly BankingClient _client = api.CreateBankingClient();
 
     [Fact]
     public async Task A_deposit_without_an_amount_is_a_validation_error()
@@ -19,7 +19,7 @@ public sealed class DepositRequestTests(BankingApiFactory api) : IClassFixture<B
         };
         request.Headers.Add("Idempotency-Key", BankingClient.NewKey());
 
-        using var response = await _client.Http.SendAsync(request, TestContext.Current.CancellationToken);
+        using var response = await _client.Teller.SendAsync(request, TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         var problem = await BankingClient.ProblemAsync(response);

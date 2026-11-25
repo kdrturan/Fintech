@@ -16,6 +16,8 @@ public sealed class BankingApiFactory(PostgresFixture postgres) : WebApplication
 {
     public const string Password = "Correct-Horse-9";
 
+    public const string TellerEmail = "teller@example.com";
+
     /// <summary>
     /// The key the API signs tokens with in tests: made fresh for every test run, never stored anywhere.
     /// Tests use it to build tokens of their own, valid or deliberately broken. Kept as parameters, not as an RSA
@@ -24,6 +26,8 @@ public sealed class BankingApiFactory(PostgresFixture postgres) : WebApplication
     public static RSAParameters SigningKey { get; } = CreateKey();
 
     private string? _accessToken;
+
+    private string? _tellerToken;
 
     public string ConnectionString { get; private set; } = string.Empty;
 
@@ -34,6 +38,18 @@ public sealed class BankingApiFactory(PostgresFixture postgres) : WebApplication
     {
         ConnectionString = await postgres.CreateDatabaseAsync();
         (CustomerId, _accessToken) = await RegisterAndSignInAsync(NewEmail());
+        _tellerToken = await SignInAsync(TellerEmail);
+    }
+
+    /// <summary>The class's customer, with a teller at hand for paying cash in.</summary>
+    public BankingClient CreateBankingClient() => new(CreateClient(), CreateTellerClient());
+
+    /// <summary>A client signed in as the teller that the API created from its configuration when it started.</summary>
+    public HttpClient CreateTellerClient()
+    {
+        var client = CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tellerToken);
+        return client;
     }
 
     /// <summary>A client without a token, for the endpoints anyone may call and for testing what happens without one.</summary>
@@ -53,11 +69,17 @@ public sealed class BankingApiFactory(PostgresFixture postgres) : WebApplication
         registered.StatusCode.ShouldBe(HttpStatusCode.Created);
         var user = (await registered.Content.ReadFromJsonAsync<RegisteredUserDto>(cancellation))!;
 
+        return (user.Id, await SignInAsync(email));
+    }
+
+    private async Task<string> SignInAsync(string email)
+    {
+        var cancellation = TestContext.Current.CancellationToken;
+        using var client = CreateAnonymousClient();
+
         using var signedIn = await client.PostAsJsonAsync("/auth/login", new { email, password = Password }, cancellation);
         signedIn.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var login = (await signedIn.Content.ReadFromJsonAsync<LoginDto>(cancellation))!;
-
-        return (user.Id, login.AccessToken);
+        return (await signedIn.Content.ReadFromJsonAsync<LoginDto>(cancellation))!.AccessToken;
     }
 
     public static string NewEmail() => $"user-{Guid.NewGuid():N}@example.com";
@@ -66,6 +88,8 @@ public sealed class BankingApiFactory(PostgresFixture postgres) : WebApplication
     {
         builder.UseSetting("ConnectionStrings:Banking", ConnectionString);
         builder.UseSetting("TransferRecovery:Enabled", "false");
+        builder.UseSetting("SeedTeller:Email", TellerEmail);
+        builder.UseSetting("SeedTeller:Password", Password);
         using var rsa = RSA.Create(SigningKey);
         builder.UseSetting("Jwt:SigningKey", Convert.ToBase64String(rsa.ExportPkcs8PrivateKey()));
     }

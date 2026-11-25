@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using Banking.Modules.Identity.Contracts;
 using Banking.Modules.Ledger.Application.Accounts;
 using Banking.Web.Errors;
 using Banking.Web.Idempotency;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,8 +15,10 @@ namespace Banking.Modules.Ledger.Presentation;
 public sealed class AccountsController(ISender sender) : ControllerBase
 {
     [HttpPost]
+    [Authorize(Roles = IdentityRoles.Customer)]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Open(OpenAccountRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -34,11 +38,16 @@ public sealed class AccountsController(ISender sender) : ControllerBase
         return result.IsSuccess ? Ok(result.Value) : this.Problem(result.Error!);
     }
 
-    /// <summary>Cash paid in for the customer. Moves money, so a retry must never pay in twice.</summary>
+    /// <summary>
+    /// Cash a customer hands over at the counter. Only a teller can pay it in: a customer who could would be printing
+    /// money. Moves money, so a retry must never pay in twice.
+    /// </summary>
     [HttpPost("{id:guid}/deposits")]
+    [Authorize(Roles = IdentityRoles.Teller)]
     [Idempotent]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> Deposit(Guid id, DepositRequest request, CancellationToken cancellationToken)

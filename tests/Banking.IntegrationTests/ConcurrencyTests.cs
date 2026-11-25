@@ -9,7 +9,7 @@ namespace Banking.IntegrationTests;
 /// </summary>
 public sealed class ConcurrencyTests(BankingApiFactory api) : IClassFixture<BankingApiFactory>
 {
-    private readonly BankingClient _client = new(api.CreateClient());
+    private readonly BankingClient _client = api.CreateBankingClient();
 
     [Fact]
     public async Task Concurrent_transfers_never_spend_more_than_the_balance()

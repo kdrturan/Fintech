@@ -12,6 +12,10 @@
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
   </ItemGroup>
 
+  <ItemGroup Label="Hosting">
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Banking.Modules.Identity.Application\Banking.Modules.Identity.Application.csproj" />
   </ItemGroup>
