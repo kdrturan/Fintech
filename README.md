@@ -96,7 +96,9 @@ The API listens on `http://localhost:5104`. Liveness check: `GET /health`. The O
 | Endpoint | Does | Idempotency-Key |
 |---|---|---|
 | `POST /accounts` | Opens an account in a currency (customers) | required |
+| `GET /accounts` | Lists the caller's own accounts | |
 | `GET /accounts/{id}` | Returns the account and its balance (its owner) | |
+| `GET /accounts/{id}/entries` | What happened on the account, newest first, in pages: `limit`, `after` (its owner) | |
 | `POST /accounts/{id}/deposits` | Pays cash in (tellers only) | required |
 | `POST /transfers` | Moves money from the caller's own account; 201 `Completed` or 422 with `transferId` | required |
 | `GET /transfers/{id}` | Returns a transfer's status and failure reason (who requested it) | |

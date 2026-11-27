@@ -50,7 +50,7 @@ internal sealed class PostingConfiguration : IEntityTypeConfiguration<Posting>
         // Same module, same schema: the database may enforce that a posting points to a real account.
         builder.HasOne<Account>().WithMany().HasForeignKey(posting => posting.AccountId).OnDelete(DeleteBehavior.Restrict);
 
-        // Statements and reconciliation read postings by account.
-        builder.HasIndex(posting => posting.AccountId);
+        // Statements and reconciliation read postings by account; a statement also reads them in order, page by page.
+        builder.HasIndex(nameof(Posting.AccountId), "Id");
     }
 }

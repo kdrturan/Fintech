@@ -149,11 +149,11 @@ namespace Banking.Modules.Ledger.Infrastructure.Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_postings");
 
-                    b.HasIndex("AccountId")
-                        .HasDatabaseName("ix_postings_account_id");
-
                     b.HasIndex("JournalEntryId")
                         .HasDatabaseName("ix_postings_journal_entry_id");
+
+                    b.HasIndex("AccountId", "Id")
+                        .HasDatabaseName("ix_postings_account_id_id");
 
                     b.ToTable("postings", "ledger");
                 });

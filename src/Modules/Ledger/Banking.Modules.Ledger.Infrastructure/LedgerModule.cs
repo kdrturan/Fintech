@@ -21,6 +21,7 @@ public static class LedgerModule
             .UseSnakeCaseNamingConvention());
 
         services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<IAccountEntryReader, AccountEntryReader>();
         services.AddScoped<ILedgerPoster, LedgerPoster>();
         services.AddScoped<ILedgerApi, LedgerApi>();
 

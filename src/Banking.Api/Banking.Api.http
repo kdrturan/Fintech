@@ -81,6 +81,14 @@ Idempotency-Key: deposit-1
 GET {{host}}/accounts/{{ahmet}}
 Authorization: Bearer {{token}}
 
+### My accounts
+GET {{host}}/accounts
+Authorization: Bearer {{token}}
+
+### What happened on the account, newest first. To get the next page, paste "nextCursor" from the response into &after=
+GET {{host}}/accounts/{{ahmet}}/entries?limit=2
+Authorization: Bearer {{token}}
+
 ### Transfer 30 TL. Send it twice: the second answer is the first one replayed (Idempotent-Replayed: true).
 ### Change the key for a new transfer. Copy the "id", or "transferId" from a 422, into @transfer below.
 POST {{host}}/transfers

@@ -6,6 +6,12 @@ namespace Banking.IntegrationTests;
 
 public sealed record AccountDto(Guid Id, string Currency, decimal Balance);
 
+public sealed record AccountListDto(AccountDto[] Items);
+
+public sealed record EntryDto(Guid Id, Guid OperationId, decimal Amount, string Currency, DateTimeOffset CreatedAt);
+
+public sealed record EntryListDto(EntryDto[] Items, string? NextCursor);
+
 public sealed record TransferDto(Guid Id, Guid SourceAccountId, Guid DestinationAccountId, decimal Amount, string Currency, string Status, string? FailureReason);
 
 public sealed record RegisteredUserDto(Guid Id, string Email);
@@ -46,6 +52,12 @@ public sealed class BankingClient(HttpClient http, HttpClient teller)
 
     public async Task<AccountDto> GetAccountAsync(Guid id) =>
         (await http.GetFromJsonAsync<AccountDto>($"/accounts/{id}", Cancellation))!;
+
+    public async Task<AccountDto[]> ListAccountsAsync() =>
+        (await http.GetFromJsonAsync<AccountListDto>("/accounts", Cancellation))!.Items;
+
+    public async Task<EntryListDto> ListEntriesAsync(Guid accountId, int limit = 100, string? after = null) =>
+        (await http.GetFromJsonAsync<EntryListDto>($"/accounts/{accountId}/entries?limit={limit}&after={after}", Cancellation))!;
 
     public async Task<decimal> BalanceAsync(Guid id) => (await GetAccountAsync(id)).Balance;
 

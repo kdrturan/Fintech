@@ -1,5 +1,4 @@
 using System.Net;
-using Banking.Modules.Ledger.Contracts;
 using Banking.Modules.Transfers.Domain;
 using Banking.Modules.Transfers.Infrastructure.Persistence;
 using Banking.Modules.Transfers.Infrastructure.Recovery;
@@ -25,7 +24,7 @@ public sealed class CrashAfterPostingTests(BankingApiFactory api) : IClassFixtur
         var ayse = await client.OpenAccountAsync();
 
         // The same API and database, except that the Ledger "crashes" right after it moved the money.
-        await using var crashing = api.WithWebHostBuilder(builder => builder.ConfigureTestServices(CrashAfterPosting));
+        await using var crashing = api.WithWebHostBuilder(builder => builder.ConfigureTestServices(CrashingLedger.Install));
         var crashingClient = new BankingClient(crashing.CreateClient(), client.Teller);
         var key = BankingClient.NewKey();
 
@@ -64,34 +63,5 @@ public sealed class CrashAfterPostingTests(BankingApiFactory api) : IClassFixtur
 
         (await client.BalanceAsync(ahmet.Id)).ShouldBe(70m);
         (await client.BalanceAsync(ayse.Id)).ShouldBe(30m);
-    }
-
-    /// <summary>Wraps the real Ledger so that it throws after every successful posting.</summary>
-    private static void CrashAfterPosting(IServiceCollection services)
-    {
-        var original = services.Single(descriptor => descriptor.ServiceType == typeof(ILedgerApi));
-        var implementation = original.ImplementationType!;
-        services.Remove(original);
-        services.Add(new ServiceDescriptor(implementation, implementation, original.Lifetime));
-        services.Add(new ServiceDescriptor(
-            typeof(ILedgerApi),
-            provider => new CrashingLedgerApi((ILedgerApi)provider.GetRequiredService(implementation)),
-            original.Lifetime));
-    }
-
-    private sealed class CrashingLedgerApi(ILedgerApi inner) : ILedgerApi
-    {
-        public async Task<LedgerPostResult> TransferAsync(
-            Guid idempotencyKey,
-            Guid requestedBy,
-            Guid sourceAccountId,
-            Guid destinationAccountId,
-            decimal amount,
-            string currency,
-            CancellationToken cancellationToken)
-        {
-            var result = await inner.TransferAsync(idempotencyKey, requestedBy, sourceAccountId, destinationAccountId, amount, currency, cancellationToken);
-            return result.Succeeded ? throw new InvalidOperationException("Simulated crash after the Ledger posted.") : result;
-        }
     }
 }

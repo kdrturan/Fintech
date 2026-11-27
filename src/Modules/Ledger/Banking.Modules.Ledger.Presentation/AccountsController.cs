@@ -34,12 +34,33 @@ public sealed class AccountsController(ISender sender) : ControllerBase
             : this.Problem(result.Error!);
     }
 
+    /// <summary>The caller's own accounts.</summary>
+    [HttpGet]
+    [ProducesResponseType<AccountListResponse>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> List(CancellationToken cancellationToken) =>
+        Ok(await sender.Send(new ListAccountsQuery(User.GetUserId()), cancellationToken));
+
     [HttpGet("{id:guid}")]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetAccountQuery(User.GetUserId(), id), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : this.Problem(result.Error!);
+    }
+
+    /// <summary>What happened on the caller's own account, newest first, a page at a time.</summary>
+    [HttpGet("{id:guid}/entries")]
+    [ProducesResponseType<EntryListResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ListEntries(
+        Guid id,
+        [FromQuery, Range(1, ListEntriesQuery.MaxLimit)] int limit = ListEntriesQuery.DefaultLimit,
+        [FromQuery] string? after = null,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await sender.Send(new ListEntriesQuery(User.GetUserId(), id, limit, after), cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : this.Problem(result.Error!);
     }
 
