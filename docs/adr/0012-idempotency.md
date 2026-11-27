@@ -1,6 +1,6 @@
 # 0012. Idempotency: Idempotency-Key for HTTP, a unique key in the Ledger
 
-- **Status:** Accepted
+- **Status:** Accepted. Amended by [ADR 0020](0020-idempotency-keys-per-user.md): keys belong to the user who sent them, and `POST /accounts` requires one.
 - **Date:** 2026-11-23
 
 ## Context
@@ -41,8 +41,8 @@ This ADR closes the gap left open in [ADR 0009](0009-double-entry-ledger-model.m
 ## Consequences
 
 - Clients must generate a key per attempt and reuse it for retries of that attempt.
-- After a replayed 500 the client does not learn the transfer id. It needs another way to see the outcome (account history, phase 3).
+- After a replayed 500 the client does not learn the transfer id. It needs another way to see the outcome: since phase 3, the account history ([ADR 0021](0021-account-history-with-keyset-pages.md)).
 - The fingerprint compares bytes: the same request with different whitespace or property order counts as a different request (422). Real clients resend the same bytes.
 - Stored keys grow without limit. They must be kept at least 24 hours; a cleanup job is planned with the other operational jobs (phase 5).
 - If the process dies while a request holds a key, the filter never records an outcome; the key stays "in progress" and retries get 409 until it expires. The transfer itself is still finished by the recovery job. Known limitation until keys expire.
-- Keys are global for now; phase 3 scopes them per user.
+- Keys were global; since phase 3 they belong to the user who sent them ([ADR 0020](0020-idempotency-keys-per-user.md)).

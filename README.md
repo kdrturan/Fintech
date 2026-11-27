@@ -4,7 +4,7 @@
 
 A digital banking and wallet backend built with .NET 10 and PostgreSQL, focused on the problems that make financial systems hard: **atomic money movement, a double-entry ledger, concurrency, and idempotency.**
 
-> Status: phase 2 of the [roadmap](docs/roadmap.md) is done: accounts, deposits and transfers over HTTP, persisted in PostgreSQL, safe under concurrent requests, retries and crashes. Phase 3 (identity) is next.
+> Status: phase 3 of the [roadmap](docs/roadmap.md) is done: customers register and sign in, tellers pay cash in, and every account, transfer and history page is reachable only by its owner. Money moves safely under concurrent requests, retries and crashes (phase 2). Phase 4 (messaging) is next.
 
 ## Architecture
 
@@ -26,6 +26,8 @@ A **modular monolith**: one deployable application whose modules are isolated as
 
 The **Ledger** is the single place where money moves: it applies balanced journal entries atomically and idempotently ([ADR 0009](docs/adr/0009-double-entry-ledger-model.md)). Business modules such as **Transfers** (and later Payments) own workflows and ask the Ledger to post. See [ADR 0003](docs/adr/0003-modular-monolith-with-ledger-as-posting-engine.md) for the reasoning and the alternatives that were rejected.
 
+The **Identity** module registers users and issues the tokens: short RS256 access tokens and rotating refresh tokens ([ADR 0017](docs/adr/0017-identity-with-aspnet-core-identity-and-own-jwts.md), [ADR 0018](docs/adr/0018-access-and-refresh-tokens.md)). The other modules never call it; they read the caller's id from the token. Roles decide what a caller may do, and the Ledger checks who owns each account ([ADR 0019](docs/adr/0019-authorization-roles-and-account-ownership.md)).
+
 Module boundaries are enforced by [architecture tests](tests/Banking.ArchitectureTests) that inspect the compiled assemblies, not by convention. HTTP endpoints are controllers in a `Presentation` project per module ([ADR 0005](docs/adr/0005-use-controllers-for-http-endpoints.md), [ADR 0013](docs/adr/0013-http-api-layer.md)).
 
 ### How a transfer stays correct
@@ -34,6 +36,8 @@ Module boundaries are enforced by [architecture tests](tests/Banking.Architectur
 |---|---|
 | Two transfers spend the same balance | Accounts are locked with `SELECT ... FOR UPDATE` in id order ([ADR 0011](docs/adr/0011-concurrency-control.md)) |
 | A double-click or a retry after a lost response | `Idempotency-Key`: the first response is stored and replayed ([ADR 0012](docs/adr/0012-idempotency.md)) |
+| Someone moves money out of another customer's account | The Ledger checks that the source belongs to the requester, on every post, the recovery job's included ([ADR 0019](docs/adr/0019-authorization-roles-and-account-ownership.md)) |
+| Someone sends another customer's idempotency key | Keys belong to the user who sent them ([ADR 0020](docs/adr/0020-idempotency-keys-per-user.md)) |
 | A crash after the money moved | The transfer is recorded as `Pending` first; a recovery job finishes it ([ADR 0014](docs/adr/0014-synchronous-transfers-and-recovery.md)) |
 | The recovery job posts the same transfer again | The Ledger's unique idempotency key returns the original result ([ADR 0012](docs/adr/0012-idempotency.md)) |
 | The request and the recovery job finish the same transfer | Optimistic concurrency on `xmin`: the later write loses ([ADR 0011](docs/adr/0011-concurrency-control.md)) |
@@ -45,8 +49,9 @@ src/
   Banking.Api/                    host and composition root
   BuildingBlocks/
     Banking.SharedKernel/         Money, Currency, Result, Error
-    Banking.Web/                  problem details, Idempotency-Key filter and store
+    Banking.Web/                  problem details, JWT validation, Idempotency-Key filter and store
   Modules/
+    Identity/                     Domain / Application / Infrastructure / Contracts / Presentation
     Ledger/                       Domain / Application / Infrastructure / Contracts / Presentation
     Transfers/                    Domain / Application / Infrastructure / Contracts / Presentation
 tests/
@@ -93,8 +98,15 @@ The API listens on `http://localhost:5104`. Liveness check: `GET /health`. The O
 
 ## API
 
+Every endpoint needs `Authorization: Bearer <access token>` except register, login and refresh.
+
 | Endpoint | Does | Idempotency-Key |
 |---|---|---|
+| `POST /auth/register` | Creates a customer (e-mail and password) | |
+| `POST /auth/login` | Returns an access token (15 minutes) and a refresh token (14 days) | |
+| `POST /auth/refresh` | Exchanges a refresh token for a new pair; a reused one ends the session | |
+| `POST /auth/logout` | Ends the session of a refresh token | |
+| `GET /me` | Who the token belongs to | |
 | `POST /accounts` | Opens an account in a currency (customers) | required |
 | `GET /accounts` | Lists the caller's own accounts | |
 | `GET /accounts/{id}` | Returns the account and its balance (its owner) | |
@@ -125,3 +137,8 @@ Errors are RFC 9457 problem details with a stable `errorCode` ([ADR 0013](docs/a
 | [0014](docs/adr/0014-synchronous-transfers-and-recovery.md) | Synchronous transfers with a recovery job |
 | [0015](docs/adr/0015-use-mediatr.md) | Use MediatR for commands and queries |
 | [0016](docs/adr/0016-integration-test-database-per-class.md) | Integration tests: a database per test class, copied from a template |
+| [0017](docs/adr/0017-identity-with-aspnet-core-identity-and-own-jwts.md) | Identity: ASP.NET Core Identity's core, with our own tokens |
+| [0018](docs/adr/0018-access-and-refresh-tokens.md) | Tokens: short RS256 access tokens, rotating refresh tokens in sessions |
+| [0019](docs/adr/0019-authorization-roles-and-account-ownership.md) | Authorization: roles for what you may do, ownership for what is yours |
+| [0020](docs/adr/0020-idempotency-keys-per-user.md) | Idempotency keys belong to the user who sent them |
+| [0021](docs/adr/0021-account-history-with-keyset-pages.md) | Account history: keyset pages ordered by posting id |
