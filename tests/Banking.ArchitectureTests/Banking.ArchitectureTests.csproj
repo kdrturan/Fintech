@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\..\src\Banking.Api\Banking.Api.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\Banking.Messaging\Banking.Messaging.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Banking.SharedKernel\Banking.SharedKernel.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\Banking.Web\Banking.Web.csproj" />
     <ProjectReference Include="..\..\src\Modules\Identity\Banking.Modules.Identity.Application\Banking.Modules.Identity.Application.csproj" />

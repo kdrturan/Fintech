@@ -38,6 +38,10 @@ internal sealed class TransferConfiguration : IEntityTypeConfiguration<Transfer>
         builder.Property(transfer => transfer.Status).HasConversion<string>().HasMaxLength(16);
         builder.Property(transfer => transfer.FailureReason).HasMaxLength(100);
 
+        // Not a column: the context turns the events into outbox rows when it saves (TransfersDbContext). EF Core would
+        // skip a list of interfaces on its own; saying so here keeps it that way if the type ever changes.
+        builder.Ignore(transfer => transfer.Events);
+
         builder.Property<DateTimeOffset>(CreatedAt).HasDefaultValueSql("now()");
 
         // Optimistic concurrency: PostgreSQL's xmin system column changes on every update of the row.

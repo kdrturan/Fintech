@@ -6,6 +6,7 @@ internal enum Layer
 {
     SharedKernel,
     Web,
+    Messaging,
     Domain,
     Application,
     Infrastructure,
@@ -36,6 +37,7 @@ internal sealed record Component(string Name, string? Module, Layer Layer, IRead
             ["Banking", "Modules", var module, var layer] => new(name, module, Enum.Parse<Layer>(layer), dependencies),
             ["Banking", "SharedKernel"] => new(name, null, Layer.SharedKernel, dependencies),
             ["Banking", "Web"] => new(name, null, Layer.Web, dependencies),
+            ["Banking", "Messaging"] => new(name, null, Layer.Messaging, dependencies),
             ["Banking", "Api"] => new(name, null, Layer.Host, dependencies),
             _ => throw new InvalidOperationException(
                 $"Assembly '{name}' does not follow a known naming convention. Classify it in {nameof(Component)}.{nameof(From)}."),

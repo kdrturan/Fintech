@@ -3,6 +3,7 @@
     <Project Path="src/Banking.Api/Banking.Api.csproj" />
   </Folder>
   <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/Banking.Messaging/Banking.Messaging.csproj" />
     <Project Path="src/BuildingBlocks/Banking.SharedKernel/Banking.SharedKernel.csproj" Id="11b82179-96bd-493c-b767-45f6d34fd0fe" />
     <Project Path="src/BuildingBlocks/Banking.Web/Banking.Web.csproj" Id="b60f704a-5803-4f66-938a-a0bbf99ab5ad" />
   </Folder>

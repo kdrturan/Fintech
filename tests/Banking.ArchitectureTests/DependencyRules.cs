@@ -13,6 +13,9 @@ internal static class DependencyRules
         // HTTP building blocks (error responses, idempotency) shared by every module's controllers.
         Layer.Web => to.Layer == Layer.SharedKernel,
 
+        // Messaging building blocks (the outbox) shared by every module's Infrastructure. Knows no module.
+        Layer.Messaging => to.Layer == Layer.SharedKernel,
+
         // Contracts cross module (and later process) boundaries, so they carry primitives only.
         Layer.Contracts => false,
 
@@ -24,9 +27,9 @@ internal static class DependencyRules
             to.Layer is Layer.SharedKernel or Layer.Contracts
             || (from.IsInSameModuleAs(to) && to.Layer is Layer.Domain),
 
-        // Adapters: may see every inner layer of their own module.
+        // Adapters: may see every inner layer of their own module, and the outbox they write to.
         Layer.Infrastructure =>
-            to.Layer is Layer.SharedKernel or Layer.Contracts
+            to.Layer is Layer.SharedKernel or Layer.Contracts or Layer.Messaging
             || (from.IsInSameModuleAs(to) && to.Layer is Layer.Domain or Layer.Application),
 
         // Controllers: HTTP in, MediatR requests of their own module out. Never the database, never the domain.
@@ -37,7 +40,7 @@ internal static class DependencyRules
             || (from.IsInSameModuleAs(to) && to.Layer is Layer.Application),
 
         // Composition root wires modules together through their Infrastructure and Presentation entry points.
-        Layer.Host => to.Layer is Layer.SharedKernel or Layer.Web or Layer.Contracts or Layer.Infrastructure or Layer.Presentation,
+        Layer.Host => to.Layer is Layer.SharedKernel or Layer.Web or Layer.Messaging or Layer.Contracts or Layer.Infrastructure or Layer.Presentation,
 
         _ => throw new ArgumentOutOfRangeException(nameof(from), from.Layer, "Unknown layer."),
     };

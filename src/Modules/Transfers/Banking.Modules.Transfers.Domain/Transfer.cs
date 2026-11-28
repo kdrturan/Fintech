@@ -8,6 +8,8 @@ namespace Banking.Modules.Transfers.Domain;
 /// </summary>
 public sealed class Transfer
 {
+    private readonly List<ITransferEvent> _events = [];
+
     private Transfer(TransferId id, Guid requestedBy, Guid sourceAccountId, Guid destinationAccountId, Money amount)
     {
         Id = id;
@@ -49,6 +51,15 @@ public sealed class Transfer
 
     public string? FailureReason { get; private set; }
 
+    /// <summary>
+    /// What happened to this transfer since it was last saved. Only real changes are recorded: completing a completed
+    /// transfer again records nothing, so a retry cannot announce the same outcome twice.
+    /// </summary>
+    public IReadOnlyList<ITransferEvent> Events => _events;
+
+    /// <summary>Called by persistence once the events are stored.</summary>
+    public void ClearEvents() => _events.Clear();
+
     public static Result<Transfer> Create(Guid requestedBy, Guid sourceAccountId, Guid destinationAccountId, Money amount)
     {
         ArgumentNullException.ThrowIfNull(amount);
@@ -85,6 +96,7 @@ public sealed class Transfer
                 throw new InvalidOperationException($"Transfer {Id} has failed and cannot be completed.");
             default:
                 Status = TransferStatus.Completed;
+                _events.Add(new TransferCompletedEvent(Id));
                 break;
         }
     }
@@ -103,6 +115,7 @@ public sealed class Transfer
             default:
                 Status = TransferStatus.Failed;
                 FailureReason = reason;
+                _events.Add(new TransferFailedEvent(Id, reason));
                 break;
         }
     }
